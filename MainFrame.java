@@ -1,8 +1,8 @@
 import java.awt.Dimension;
-import java.awt.Toolkit;
-import javax.swing.JLabel;
-import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
+import java.awt.Toolkit;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
@@ -11,11 +11,10 @@ public class MainFrame {
 	public static int result;
 	public static int result2;
 	
-	public static void mainFrame() {
+	public static void mainFrame() {//This function creates the JFrame and calls the other functions to commence the game
+	
 		
-		
-		
-		 JFrame frame = new JFrame();
+		 JFrame frame = new JFrame();//Creates and adjusts the JFrame
 		 frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 		 
 		 frame.setDefaultCloseOperation
@@ -44,8 +43,9 @@ public class MainFrame {
 	   
 	    boardPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
 		
+	    //function calls below
 	    
-		Board.board(frame,boardPanel,w,h);
+		Board.createBoard(frame,boardPanel,w,h);
 		
 		Dice.Dice(boardPanel);
 		
@@ -56,26 +56,24 @@ public class MainFrame {
 		
 		
 		
-		CommandPanel.commandPanel(frame,w,h,outputText);
+		CommandPanel.createCommandPanel(frame,w,h,outputText);
 		
 		Buttons.buttonsPanel(frame,w,h,outputText);
 	  
-	    InfoPanel.infoPanel(frame,w,h,outputText);
+	    InfoPanel.createInfoPanel(frame,w,h,outputText);
 	    
 	    
 		monopoly.addText(outputText,x);
 		
 		
 		
-		//monopoly.Questions();
-		Properties.Props();
+		monopoly.Questions();//Call the questions
 		
+		Properties.Props();//Fills/Creates the array of objects of properties
 		
+		tokens.tokenPanel(boardPanel ,w,h);
 		
-		
-		tokens.tokenPanel(boardPanel,w,h);
-		
-		
+		Dice.Switch(tokens.labelNames[0], result, result2);
 		
 		
 		

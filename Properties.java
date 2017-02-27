@@ -4,7 +4,7 @@ import javax.swing.JOptionPane;
 
 public class Properties 
 
-{
+{	//Variables and array required to store content and constants etc.
 	public int xcoordinate;
 	public int ycoordinate;
 	public String name;
@@ -242,3 +242,4 @@ public class Properties
 	}
 
 }
+

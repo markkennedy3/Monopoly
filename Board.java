@@ -8,16 +8,16 @@ import javax.swing.JLabel;
 import javax.swing.border.EtchedBorder;
 public class Board
 {
-	public static void board(JFrame frame,JLayeredPane boardPanel,int w,int h) {
+	public static void createBoard(JFrame frame,JLayeredPane boardPanel,int w,int h) {//function that creates the board panel
 
-  JPanel monopolyBoard = new JPanel();
+  JPanel monopolyBoard = new JPanel();//Creates and sets the bound of the board panel
   monopolyBoard.setOpaque(true);
   monopolyBoard.setBounds(1,1,h-1,h-1);
    
   monopolyBoard.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
  
   
-  ImageIcon icon = new ImageIcon("monopoly.png");
+  ImageIcon icon = new ImageIcon("res/images/monopoly.png");
   
   Image image = icon.getImage();
   

@@ -7,12 +7,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import java.util.Random;
-import java.awt.BorderLayout;
 
+import java.awt.BorderLayout;
 
 public class Dice {
 	
+	public static int totalresult;
 	
 	public static int Dice(JLayeredPane boardPanel){
 		
@@ -25,7 +25,7 @@ public class Dice {
 	     diceButton.setBounds(450,200,60,60);
 	    
 	     if(MainFrame.result==1){
-	     ImageIcon icon = new ImageIcon("1.png");
+	     ImageIcon icon = new ImageIcon("res/images/1.png");
 	     Image image = icon.getImage();
 	     BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
 	     Graphics g = bufferedImage.createGraphics();
@@ -37,7 +37,7 @@ public class Dice {
 	     boardPanel.add(diceButton);}
 	    
 	     else if(MainFrame.result==2){
-	         ImageIcon icon = new ImageIcon("2.png");
+	         ImageIcon icon = new ImageIcon("res/images/2.png");
 	         Image image = icon.getImage();
 	         BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
 	         Graphics g = bufferedImage.createGraphics();
@@ -49,7 +49,7 @@ public class Dice {
 	         boardPanel.add(diceButton);}
 	         
 	     else if(MainFrame.result==3){
-         ImageIcon icon = new ImageIcon("3.png");
+         ImageIcon icon = new ImageIcon("res/images/3.png");
          Image image = icon.getImage();
          BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
          Graphics g = bufferedImage.createGraphics();
@@ -61,7 +61,7 @@ public class Dice {
          boardPanel.add(diceButton);}
 	     
 	     else if(MainFrame.result==4){
-         ImageIcon icon = new ImageIcon("4.png");
+         ImageIcon icon = new ImageIcon("res/images/4.png");
          Image image = icon.getImage();
          BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
          Graphics g = bufferedImage.createGraphics();
@@ -73,7 +73,7 @@ public class Dice {
          boardPanel.add(diceButton);}
 	     
 	     else if(MainFrame.result==5){
-         ImageIcon icon = new ImageIcon("5.png");
+         ImageIcon icon = new ImageIcon("res/images/5.png");
          Image image = icon.getImage();
          BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
          Graphics g = bufferedImage.createGraphics();
@@ -85,7 +85,7 @@ public class Dice {
          boardPanel.add(diceButton);}
 	     
 	     else if(MainFrame.result==6){
-         ImageIcon icon = new ImageIcon("6.png");
+         ImageIcon icon = new ImageIcon("res/images/6.png");
          Image image = icon.getImage();
          BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
          Graphics g = bufferedImage.createGraphics();
@@ -110,7 +110,7 @@ public static int Dice2(JLayeredPane boardPanel){
      diceButton.setBounds(550,200,60,60);
    
      if(MainFrame.result2==1){
-     ImageIcon icon = new ImageIcon("1.png");
+     ImageIcon icon = new ImageIcon("res/images/1.png");
      Image image = icon.getImage();
      BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
      Graphics g = bufferedImage.createGraphics();
@@ -122,7 +122,7 @@ public static int Dice2(JLayeredPane boardPanel){
      boardPanel.add(diceButton);}
     
      else if(MainFrame.result2==2){
-         ImageIcon icon = new ImageIcon("2.png");
+         ImageIcon icon = new ImageIcon("res/images/2.png");
          Image image = icon.getImage();
          BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
          Graphics g = bufferedImage.createGraphics();
@@ -134,7 +134,7 @@ public static int Dice2(JLayeredPane boardPanel){
          boardPanel.add(diceButton);}
          
      else if(MainFrame.result2==3){
-     ImageIcon icon = new ImageIcon("3.png");
+     ImageIcon icon = new ImageIcon("res/images/3.png");
      Image image = icon.getImage();
      BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
      Graphics g = bufferedImage.createGraphics();
@@ -146,7 +146,7 @@ public static int Dice2(JLayeredPane boardPanel){
      boardPanel.add(diceButton);}
      
      else if(MainFrame.result2==4){
-     ImageIcon icon = new ImageIcon("4.png");
+     ImageIcon icon = new ImageIcon("res/images/4.png");
      Image image = icon.getImage();
      BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
      Graphics g = bufferedImage.createGraphics();
@@ -158,7 +158,7 @@ public static int Dice2(JLayeredPane boardPanel){
      boardPanel.add(diceButton);}
      
      else if(MainFrame.result2==5){
-     ImageIcon icon = new ImageIcon("5.png");
+     ImageIcon icon = new ImageIcon("res/images/5.png");
      Image image = icon.getImage();
      BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
      Graphics g = bufferedImage.createGraphics();
@@ -170,7 +170,7 @@ public static int Dice2(JLayeredPane boardPanel){
      boardPanel.add(diceButton);}
      
      else if(MainFrame.result2==6){
-     ImageIcon icon = new ImageIcon("6.png");
+     ImageIcon icon = new ImageIcon("res/images/6.png");
      Image image = icon.getImage();
      BufferedImage bufferedImage = new BufferedImage((60),(60), BufferedImage.TYPE_INT_ARGB);
      Graphics g = bufferedImage.createGraphics();
@@ -195,7 +195,6 @@ public static boolean Reroll(int result, int result2){
 	
 	
 	
-	
 	if(result==result2)
 	{
 		
@@ -214,8 +213,103 @@ public static boolean Reroll(int result, int result2){
 	}
 	
 	
+public static void Switch(JLabel tokenPanel,int result,int result2) 
 
+{
 	
-	
-	
+	totalresult = result+result2;
+
+    switch(totalresult) 
+    
+    {
+    
+       case 1 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+    	  
+          System.out.println("Output 1"); 
+          break;
+       case 2 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+          System.out.println("Output 2");
+          break;
+       case 3 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+          System.out.println("Output 3");
+          break;
+       case 4 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+          System.out.println("Output 4");
+          break;
+       case 5 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+           System.out.println("Output 5");
+           break;
+       case 6 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+           System.out.println("Output 6");
+           break;
+       case 7 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+           System.out.println("Output 7");
+           break;
+       case 8 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+           System.out.println("Output 8");
+           break;
+       case 9 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+           System.out.println("Output 9");
+           break;
+       case 10 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+           System.out.println("Output 10");
+           break;
+       case 11 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+           System.out.println("Output 11");
+           break;
+       case 12 :
+    	   for(int r = 0; r < monopoly.numOfPlayers; r++){
+    		   tokenPanel.setBounds(Properties.propertiesArray[r].xcoordinate, Properties.propertiesArray[r].ycoordinate ,30,30);
+    	   }
+           System.out.println("Output 12");
+           break;
+       /*case 13 :
+    	   if(result==result2)
+    		{
+    		    tokenPanel.setBounds(Properties.propertiesArray[12].xcoordinate, Properties.propertiesArray[12].ycoordinate ,30,30);
+    			System.out.println("They are the same re-roll");
+    		}
+    	   
+           System.out.println("Output 13");
+           break;*/
+           
+       default :
+          System.out.println("Invalid output");
+    }
+    System.out.println("the total rolled dice amount is " + totalresult);
 }
+}
+	

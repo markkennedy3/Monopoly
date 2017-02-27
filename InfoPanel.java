@@ -1,13 +1,12 @@
-
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
 
 public class InfoPanel {
-public static void infoPanel(JFrame frame,int w,int h,JTextArea outputText) {
+public static void createInfoPanel(JFrame frame,int w,int h,JTextArea outputText) {//creates the info panel
 	
 
-		 JLabel outputLable = new JLabel(" Information Panel:");
+		 JLabel outputLable = new JLabel(" Information Panel:");//creates and sets position of the panel
 		 JPanel infoPanel = new JPanel();
 		 frame.add(infoPanel);
 		 infoPanel.setBounds(h,h/5,((((w-h)/3)*2)),((h/5)*4));
