@@ -19,8 +19,9 @@ public class UI {
 	public static final int CMD_PROPERTY = 6;
 	public static final int CMD_BALANCE = 7;
 	public static final int CMD_BANKRUPT = 8;
-	public static final int CMD_HELP = 9;
-	public static final int CMD_BUILD = 10;
+	public static final int CMD_HELP = 11;
+	public static final int CMD_BUILD = 9;
+	public static final int CMD_MORTGAGE = 10;
 	
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
@@ -32,8 +33,8 @@ public class UI {
 	public static final int ERR_IS_OWNED = 7;
 	public static final int ERR_SELF_OWNED = 8;
 	public static final int ERR_RENT_OWED= 9;
-	public static final int ERR_BANKRUPT = 10;
-	public static final int ERR_BUILD = 11;
+	public static final int ERR_ALREADY_MORTGAGED = 10;
+	public static final int ERR_MAX_HOUSES = 11;
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
@@ -45,9 +46,7 @@ public class UI {
 		"Error: The property is not owned.",
 		"Error: The property is already owned.",
 		"Error: You own the property.",
-		"Error: You owe rent.",
-		"You are Bankrupt, Your game is over",
-		"Error: You cannot build a property"
+		"Error: You owe rent."
 	};
 	
 	private JFrame frame = new JFrame();
@@ -145,7 +144,9 @@ public class UI {
 				case "build" :
 					commandId = CMD_BUILD;
 					inputValid = true;
-					break;
+				case "mortgage" :
+					commandId = CMD_MORTGAGE;
+					inputValid = true;
 				default:
 					inputValid = false;
 				}
@@ -225,7 +226,7 @@ public class UI {
 	}
 	
 	public void displayCommandHelp () {
-		infoPanel.displayString("Available commands: roll, pay rent, buy, property, balance, build, bankrupt, done, quit. ");
+		infoPanel.displayString("Available commands: roll, pay rent, buy, property, balance, done, quit. ");
 		return;
 	}
 	
