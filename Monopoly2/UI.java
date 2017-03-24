@@ -8,7 +8,7 @@ public class UI {
 
 	private static final int FRAME_WIDTH = 1200;
 	private static final int FRAME_HEIGHT = 800;
-	private static final String CURRENCY = " pounds";
+	private static final String CURRENCY = " Euro";
 	
 	public static final int CMD_QUIT = 0;
 	public static final int CMD_DONE = 1;

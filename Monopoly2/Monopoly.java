@@ -31,6 +31,7 @@ public class Monopoly {
 		return;
 	}
 	
+	
 	public void giveStartMoney () {
 		for (Player p : players) {
 			p.doTransaction (START_MONEY);
@@ -181,13 +182,13 @@ public class Monopoly {
 					gameOver = true;
 					break;
 				case UI.CMD_BANKRUPT : 
-					ui.displayError(UI.ERR_BANKRUPT);
-					players.remove(players.indexOf(currPlayer));
+					/*ui.displayError(UI.ERR_BANKRUPT);
+					players.remove(currPlayer);
 					turnFinished = true;
-					break;	
+					break;	*/
 				case UI.CMD_BUILD : 
-					ui.displayError(UI.ERR_BUILD);
-					break;	
+					/*ui.displayError(UI.ERR_BUILD);
+					break;	*/
 				
 			}
 		} while (!turnFinished);
@@ -195,7 +196,7 @@ public class Monopoly {
 	}
 	
 	public void nextPlayer () {
-		currPlayer = players.get((players.indexOf(currPlayer) + 1) % players.size());
+			currPlayer = players.get((players.indexOf(currPlayer) + 1) % players.size());
 		return;
 	}
 	
@@ -223,6 +224,7 @@ public class Monopoly {
 		ui.displayGameOver ();
 		return;
 	}
+	
 	
 	public boolean isGameOver () {
 		return gameOver;
