@@ -35,4 +35,12 @@ public class Property extends Square {
 	public Player getOwner () {
 		return owner;
 	}
+	
+	//Function which removes the current player as owner of a property
+	public void removeOwner (Player inPlayer) {
+		owner = inPlayer;
+		isOwned = false;
+		return;
+	}
+	
 }

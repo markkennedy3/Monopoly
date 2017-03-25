@@ -184,15 +184,13 @@ public class Monopoly {
 					gameOver = true;
 					break;
 				case UI.CMD_BANKRUPT : 
-					currPlayer.clearProperties();
-					
-					players.remove(currPlayer);
+					ui.displayReturnedProperties(currPlayer); //Displays all the properties which will be returned to the bank
+					currPlayer.clearProperties(); //Returns the properties to the bank
+					players.remove(currPlayer); //Removes the current player from the game
 					numPlayers -= 1;
-					
-					 if(numPlayers==1){
-						 gameOver = true;
-					 }
-					turnFinished = true;
+					 if(numPlayers==1){   //checks to see if the game is over
+						 gameOver = true;}
+					turnFinished = true; //finishes the current players turn
 					break;	
 				case UI.CMD_BUILD : 
 					ui.displayError(UI.ERR_BUILD);

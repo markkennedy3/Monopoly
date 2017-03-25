@@ -262,6 +262,20 @@ public class UI {
 		}
 	}
 	
+	//Function which displays the properties which will be returned to the bank
+	//when a player goes bankrupt.
+	public void displayReturnedProperties (Player player) { 
+		ArrayList<Property> propertyList = player.getProperties();
+		if (propertyList.size() == 0) {
+			return;
+		} else {
+			infoPanel.displayString(player + " returned the following properties to the Bank...");
+			for (Property p : propertyList) {
+				infoPanel.displayString(p.getName());				
+		     }
+		   }
+		}
+	
 	public void displaySquare (Player player, Board board) {
 		infoPanel.displayString(player + " arrives at " + board.getSquare(player.getPosition()).getName() + ".");
 		if (board.isProperty(player.getPosition())) {

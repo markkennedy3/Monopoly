@@ -74,7 +74,11 @@ public class Player {
 		return properties;
 	}
 	
+	//Function which clears all properties ownedby the bankrupt player
 	public ArrayList<Property> clearProperties () {
+		for (Property property: properties) {
+			property.removeOwner(null);
+		}
 		properties = null;
 		return properties;
 	}
