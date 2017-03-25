@@ -13,6 +13,7 @@ public class Monopoly {
 	private Dice dice = new Dice();
 	private boolean gameOver = false;
 	private Board board = new Board();
+	Property property;
 	
 	Monopoly () {
 		numPlayers = 0;
@@ -183,8 +184,11 @@ public class Monopoly {
 					gameOver = true;
 					break;
 				case UI.CMD_BANKRUPT : 
+					currPlayer.clearProperties();
+					
 					players.remove(currPlayer);
 					numPlayers -= 1;
+					
 					 if(numPlayers==1){
 						 gameOver = true;
 					 }

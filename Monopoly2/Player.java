@@ -65,6 +65,7 @@ public class Player {
 		return;
 	}
 	
+	
 	public Property getLatestProperty () {
 		return properties.get(properties.size()-1);
 	}
@@ -72,6 +73,12 @@ public class Player {
 	public ArrayList<Property> getProperties () {
 		return properties;
 	}
+	
+	public ArrayList<Property> clearProperties () {
+		properties = null;
+		return properties;
+	}
+	
 	
 	public int getAssets () {
 		int assets = balance;
