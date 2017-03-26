@@ -22,6 +22,8 @@ public class UI {
 	public static final int CMD_HELP = 9;
 	public static final int CMD_BUILD_HOUSE = 10;
 	public static final int CMD_BUILD_HOTEL = 11;
+	public static final int CMD_DEMOLISH_HOUSE = 12;
+	public static final int CMD_DEMOLISH_HOTEL = 13;
 	
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
@@ -35,8 +37,11 @@ public class UI {
 	public static final int ERR_RENT_OWED= 9;
 	public static final int ERR_BANKRUPT = 10;
 	public static final int ERR_BUILD = 11;
-	public static final int ERR_BUILD_HOTEL = 11;
-	public static final int ERR_HOUSES = 12;
+	public static final int ERR_BUILD_HOTEL = 12;
+	public static final int ERR_HOUSES = 13;
+	public static final int ERR_HOTELS = 14;
+	public static final int ERR_DEMOLISH = 15;
+	public static final int ERR_DEMOLISH2 = 16;
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
@@ -53,7 +58,9 @@ public class UI {
 		"Error: You cannot build a property",
 		"Error: You do not have enough houses to buils a hotel",
 		"Error: You already have the max amount of houses on this property",
-		
+		"Error: You already have the max amount of hotels on this property",
+		"Error: You have no buildings here to  demolish",
+		"Error: You have cannnot demolish a building here",
 	};
 	
 	private JFrame frame = new JFrame();
@@ -156,6 +163,14 @@ public class UI {
 					commandId = CMD_BUILD_HOTEL;
 					inputValid = true;
 					break;
+				case "demolish house" :
+					commandId = CMD_DEMOLISH_HOUSE;
+					inputValid = true;
+					break;
+				case "demolish hotel" :
+					commandId = CMD_DEMOLISH_HOTEL;
+					inputValid = true;
+					break;
 				default:
 					inputValid = false;
 				}
@@ -235,7 +250,7 @@ public class UI {
 	}
 	
 	public void displayCommandHelp () {
-		infoPanel.displayString("Available commands: roll, pay rent, buy, property, balance, build, bankrupt, done, quit. ");
+		infoPanel.displayString("Available commands: roll, pay rent, buy, property, balance, build house, build hotel, bankrupt, done, quit. ");
 		return;
 	}
 	

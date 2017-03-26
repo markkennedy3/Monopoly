@@ -13,6 +13,7 @@ public class Player {
 	private ArrayList<Property> houses = new ArrayList<Property>();
 	private ArrayList<Property> hotels = new ArrayList<Property>();
 	private ArrayList<Property> developedProperties = new ArrayList<Property>();
+	private ArrayList<Property> developedProperties2 = new ArrayList<Property>();
 	
 	Player (String name, String token) {
 		this.name = name;
@@ -76,10 +77,10 @@ public class Player {
 		return;
 	}
 	
-	public void buildHotel (Property DevelopedProperty){
-		DevelopedProperty.setOwner(this);
-		hotels.add(DevelopedProperty);
-		DevelopedProperty.isHotel();
+	public void buildHotel (Property DevelopedProperty2){
+		DevelopedProperty2.setOwner(this);
+		hotels.add(DevelopedProperty2);
+		DevelopedProperty2.isHotel();
 		return;
 	}
 	
@@ -110,8 +111,8 @@ public class Player {
 	
 	public ArrayList<Property> clearHotels () {
 		
-		for (Property DevelopedProperty: hotels) {
-			DevelopedProperty.removeOwner(null);
+		for (Property DevelopedProperty2: hotels) {
+			DevelopedProperty2.removeOwner(null);
 		}
 	return	hotels;
 	}

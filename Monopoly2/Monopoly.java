@@ -16,6 +16,7 @@ public class Monopoly {
 	Property property;
 	Property DevelopedProperty;
 	private int numHouses = 0;
+	private int numHotels = 0;
 	
 	Monopoly () {
 		numPlayers = 0;
@@ -239,32 +240,91 @@ public class Monopoly {
 					
 				case UI.CMD_BUILD_HOTEL : 
 					if (board.isProperty(currPlayer.getPosition())) {
-							Property DevelopedProperty = board.getProperty(currPlayer.getPosition());
-					   if (DevelopedProperty.isOwned()) {
-							if (DevelopedProperty.getOwner().equals(currPlayer)) {
-							  if(numHouses == 4){
-								if (currPlayer.getBalance() >= 200) 	{		
-									currPlayer.doTransaction(-200);
-									ui.displayBankTransaction(currPlayer);
-									currPlayer.buildHotel(DevelopedProperty);
-									ui.displayString(currPlayer+" built a hotel on "+ DevelopedProperty);
-								} else {
-									ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
-								}
+						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
+				   if (DevelopedProperty2.isOwned()) {
+						if (DevelopedProperty2.getOwner().equals(currPlayer)) {
+						  if(numHouses == 4){
+							  if(numHotels == 1){
+							if (currPlayer.getBalance() >= 200) {				
+								currPlayer.doTransaction(-200);
+								ui.displayBankTransaction(currPlayer);
+								currPlayer.buildHotel(DevelopedProperty2);
+								numHotels += 1;
+								ui.displayString(currPlayer+" built a hotel on "+ DevelopedProperty2);
 							} else {
-								ui.displayError(UI.ERR_BUILD_HOTEL);
-								}
-							
-					   }else {
-								ui.displayError(UI.ERR_BUILD);
+								ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
 							}
-							
+							   } else {
+									ui.displayError(UI.ERR_HOTELS);
+								}
+						  } else {
+								ui.displayError(UI.ERR_BUILD_HOTEL);
+							}
 						} else {
-							ui.displayError(UI.ERR_NOT_A_PROPERTY);
+							ui.displayError(UI.ERR_BUILD);
 						}
+						}
+						else {
+							ui.displayError(UI.ERR_BUILD);
+						}
+					} else {
+						ui.displayError(UI.ERR_NOT_A_PROPERTY);
 					}
 						break;
 				
+				case UI.CMD_DEMOLISH_HOUSE : 
+					if (board.isProperty(currPlayer.getPosition())) {
+						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
+				   if (DevelopedProperty2.isOwned()) {
+						if (DevelopedProperty2.getOwner().equals(currPlayer)) {
+						  if(numHouses >= 1){
+								numHouses -= 1;
+								currPlayer.doTransaction(+100);
+								ui.displayString(currPlayer+" demolished a house on "+ DevelopedProperty2);
+								ui.displayBankTransaction(currPlayer);
+							 } else {
+									ui.displayError(UI.ERR_DEMOLISH);
+								}
+						  
+						  } else {
+								ui.displayError(UI.ERR_DEMOLISH2);
+							}
+						}
+						else {
+							ui.displayError(UI.ERR_DEMOLISH2);
+						}
+					} else {
+						ui.displayError(UI.ERR_NOT_A_PROPERTY);
+					}
+					break;
+					
+                case UI.CMD_DEMOLISH_HOTEL : 
+                	if (board.isProperty(currPlayer.getPosition())) {
+						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
+				   if (DevelopedProperty2.isOwned()) {
+						if (DevelopedProperty2.getOwner().equals(currPlayer)) {
+						  if(numHouses >= 1){
+								numHotels -= 1;
+								currPlayer.doTransaction(+100);
+								ui.displayString(currPlayer+" demolished a hotel on "+DevelopedProperty2);
+								ui.displayBankTransaction(currPlayer);
+							 } else {
+									ui.displayError(UI.ERR_DEMOLISH);
+								}
+						  
+						  } else {
+								ui.displayError(UI.ERR_DEMOLISH2);
+							}
+						}
+						else {
+							ui.displayError(UI.ERR_DEMOLISH2);
+						}
+					} else {
+						ui.displayError(UI.ERR_NOT_A_PROPERTY);
+					}
+					break;
+						
+						
 				case UI.CMD_QUIT : 
 					turnFinished = true;
 					gameOver = true;
