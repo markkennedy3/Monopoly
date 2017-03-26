@@ -2,6 +2,8 @@
 public class Property extends Square {
 
 	private boolean isOwned;
+	private boolean isHouse;
+	private boolean isHotel;
 	private int value;
 	private int rent[];
 	private Player owner;
@@ -41,6 +43,16 @@ public class Property extends Square {
 		owner = inPlayer;
 		isOwned = false;
 		return;
+	}
+	
+	public boolean isHouse (){
+		isHouse = true;
+		return isHouse;
+	}
+	
+	public boolean isHotel (){
+		isHotel = true;
+		return isHotel;
 	}
 	
 }

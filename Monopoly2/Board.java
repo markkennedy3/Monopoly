@@ -63,5 +63,6 @@ public class Board {
 	public boolean isProperty (int index) {
 		return squares[index] instanceof Property;
 	}
+	
 }
   

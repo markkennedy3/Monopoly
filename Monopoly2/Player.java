@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 
+@SuppressWarnings("unused")
 public class Player {
 	
 	private String name;
@@ -9,6 +10,9 @@ public class Player {
 	private String token;
 	private boolean passedGo;
 	private ArrayList<Property> properties = new ArrayList<Property>();
+	private ArrayList<Property> houses = new ArrayList<Property>();
+	private ArrayList<Property> hotels = new ArrayList<Property>();
+	private ArrayList<Property> developedProperties = new ArrayList<Property>();
 	
 	Player (String name, String token) {
 		this.name = name;
@@ -65,6 +69,20 @@ public class Player {
 		return;
 	}
 	
+	public void buildHouse (Property DevelopedProperty){
+		DevelopedProperty.setOwner(this);
+		houses.add(DevelopedProperty);
+		DevelopedProperty.isHouse();
+		return;
+	}
+	
+	public void buildHotel (Property DevelopedProperty){
+		DevelopedProperty.setOwner(this);
+		hotels.add(DevelopedProperty);
+		DevelopedProperty.isHotel();
+		return;
+	}
+	
 	
 	public Property getLatestProperty () {
 		return properties.get(properties.size()-1);
@@ -74,15 +92,29 @@ public class Player {
 		return properties;
 	}
 	
-	//Function which clears all properties ownedby the bankrupt player
+	//Function which clears all properties owned by the bankrupt player
 	public ArrayList<Property> clearProperties () {
 		for (Property property: properties) {
 			property.removeOwner(null);
 		}
-		properties = null;
-		return properties;
+		return properties; 
 	}
 	
+	public ArrayList<Property> clearHouses () {
+	
+		for (Property DevelopedProperty: houses) {
+			DevelopedProperty.removeOwner(null);
+		}
+	return	houses;
+	}
+	
+	public ArrayList<Property> clearHotels () {
+		
+		for (Property DevelopedProperty: hotels) {
+			DevelopedProperty.removeOwner(null);
+		}
+	return	hotels;
+	}
 	
 	public int getAssets () {
 		int assets = balance;

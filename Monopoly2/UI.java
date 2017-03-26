@@ -20,7 +20,8 @@ public class UI {
 	public static final int CMD_BALANCE = 7;
 	public static final int CMD_BANKRUPT = 8;
 	public static final int CMD_HELP = 9;
-	public static final int CMD_BUILD = 10;
+	public static final int CMD_BUILD_HOUSE = 10;
+	public static final int CMD_BUILD_HOTEL = 11;
 	
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
@@ -34,6 +35,8 @@ public class UI {
 	public static final int ERR_RENT_OWED= 9;
 	public static final int ERR_BANKRUPT = 10;
 	public static final int ERR_BUILD = 11;
+	public static final int ERR_BUILD_HOTEL = 11;
+	public static final int ERR_HOUSES = 12;
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
@@ -48,6 +51,8 @@ public class UI {
 		"Error: You owe rent.",
 		"Error: You must declare Bankruptcy",
 		"Error: You cannot build a property",
+		"Error: You do not have enough houses to buils a hotel",
+		"Error: You already have the max amount of houses on this property",
 		
 	};
 	
@@ -143,8 +148,12 @@ public class UI {
 					commandId = CMD_HELP;
 					inputValid = true;
 					break;
-				case "build" :
-					commandId = CMD_BUILD;
+				case "build house" :
+					commandId = CMD_BUILD_HOUSE;
+					inputValid = true;
+					break;
+				case "build hotel" :
+					commandId = CMD_BUILD_HOTEL;
 					inputValid = true;
 					break;
 				default:
