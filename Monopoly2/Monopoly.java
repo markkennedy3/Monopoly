@@ -5,18 +5,23 @@ public class Monopoly {
 	public static final int MAX_NUM_PLAYERS = 6;
 	private static final int START_MONEY = 1500;
 	private static final int GO_MONEY = 200;
+	private static final int HOUSE_COST = 200;//VALUES
+	private static final int HOUSE_RENT = 50;
+	private static final int HOTEL_COST = 200;
+	private static final int HOTEL_RENT = 150;
 	
 	private ArrayList<Player> players = new ArrayList<Player>();
 	private Player currPlayer;
 	private UI ui = new UI(players);
-	private int numPlayers;
+	private int numPlayers;//Number of players playing the game
 	private Dice dice = new Dice();
 	private boolean gameOver = false;
 	private Board board = new Board();
-	Property property;
-	Property DevelopedProperty;
-	private int numHouses = 0;
-	private int numHotels = 0;
+	Property property;//array of owned property
+	Property DevelopedProperty;//array of property with houses on it
+	Property DevelopedProperty2;//array of property with hotels on it 
+	private int numHouses = 0;// Initalised number of houses on a property 
+	private int numHotels = 0;// Initalised number of houses on a property 
 	
 	Monopoly () {
 		numPlayers = 0;
@@ -114,22 +119,30 @@ public class Monopoly {
 					}
 					break;
 				case UI.CMD_PAY_RENT :
-					if (board.isProperty(currPlayer.getPosition())) {
+					if (board.isProperty(currPlayer.getPosition())) {//Checks if the location is actually a property
 						Property property = board.getProperty(currPlayer.getPosition());
-						if (property.isOwned()) {
-							if (!property.getOwner().equals(currPlayer)) {
-								if (!rentPaid) {
+						if (property.isOwned()) {//checks if it is owned
+							if (!property.getOwner().equals(currPlayer)) {//checks to make sure that the owner is the not  the current player
+								if (!rentPaid) {//makes sure the rent is not paid
 									if(board.isProperty(currPlayer.getPosition())){
 										Property DevelopedProperty = board.getProperty(currPlayer.getPosition());
-								        if (currPlayer.getBalance()>=DevelopedProperty.getRent()+((50)*(numHouses))){
+								        if (currPlayer.getBalance()>=DevelopedProperty.getRent()+((HOUSE_RENT)*(numHouses))){//makes sure that the player has enough money to pay rent
 										    Player owner1 = DevelopedProperty.getOwner();
-										    currPlayer.doTransaction(-DevelopedProperty.getRent()+((50)*(numHouses)));
-										    owner1.doTransaction(+DevelopedProperty.getRent()+((50)*(numHouses)));
+										    currPlayer.doTransaction(-DevelopedProperty.getRent()+((HOUSE_RENT)*(numHouses)));//takes the correct rent out of the current players balance
+										    owner1.doTransaction(+DevelopedProperty.getRent()+((HOUSE_RENT)*(numHouses)));// adds it to the owners
 										    ui.displayTransaction(currPlayer, owner1);
 										    rentPaid = true;	
 										    rentOwed = false;
 								            } 
-								        else if (currPlayer.getBalance()>=property.getRent()) {
+								        else if (currPlayer.getBalance()>=DevelopedProperty2.getRent()+((HOTEL_RENT)*(numHotels))){// same but for hotels instead of houses
+										    Player owner1 = DevelopedProperty2.getOwner();
+										    currPlayer.doTransaction(-DevelopedProperty2.getRent()+((HOTEL_RENT)*(numHotels)));
+										    owner1.doTransaction(+DevelopedProperty2.getRent()+((HOTEL_RENT)*(numHotels)));
+										    ui.displayTransaction(currPlayer, owner1);
+										    rentPaid = true;	
+										    rentOwed = false;
+								            } 
+								        else if (currPlayer.getBalance()>=property.getRent()) {// rent just for property with no buildings
 										     Player owner2 = property.getOwner();
 										     currPlayer.doTransaction(-property.getRent());
 										     owner2.doTransaction(+property.getRent());
@@ -143,7 +156,7 @@ public class Monopoly {
 								      }
 									}
 									else{
-								    	  ui.displayError(UI.ERR_RENT_ALREADY_PAID);
+								    	  ui.displayError(UI.ERR_RENT_ALREADY_PAID);//Correct Error messages
 									}
 								} else {
 									ui.displayError(UI.ERR_RENT_ALREADY_PAID);									
@@ -214,8 +227,8 @@ public class Monopoly {
 				   if (DevelopedProperty.isOwned()) {
 						if (DevelopedProperty.getOwner().equals(currPlayer)) {
 						  if(numHouses < 4){
-							if (currPlayer.getBalance() >= 200) {				
-								currPlayer.doTransaction(-200);
+							if (currPlayer.getBalance() >= HOUSE_COST) {				
+								currPlayer.doTransaction(-HOUSE_COST);
 								ui.displayBankTransaction(currPlayer);
 								currPlayer.buildHouse(DevelopedProperty);
 								numHouses += 1;
@@ -245,8 +258,8 @@ public class Monopoly {
 						if (DevelopedProperty2.getOwner().equals(currPlayer)) {
 						  if(numHouses == 4){
 							  if(numHotels == 1){
-							if (currPlayer.getBalance() >= 200) {				
-								currPlayer.doTransaction(-200);
+							if (currPlayer.getBalance() >= HOTEL_COST) {				
+								currPlayer.doTransaction(-HOTEL_COST);
 								ui.displayBankTransaction(currPlayer);
 								currPlayer.buildHotel(DevelopedProperty2);
 								numHotels += 1;
@@ -272,18 +285,18 @@ public class Monopoly {
 					}
 						break;
 				
-				case UI.CMD_DEMOLISH_HOUSE : 
+				case UI.CMD_DEMOLISH_HOUSE : //Demolish House
 					if (board.isProperty(currPlayer.getPosition())) {
 						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
 				   if (DevelopedProperty2.isOwned()) {
-						if (DevelopedProperty2.getOwner().equals(currPlayer)) {
-						  if(numHouses >= 1){
-								numHouses -= 1;
-								currPlayer.doTransaction(+100);
+						if (DevelopedProperty2.getOwner().equals(currPlayer)) {//makes sure that the property is owned by the player in question
+						  if(numHouses >= 1){//makes sure that theres at least one house to demolish
+								numHouses -= 1;//deducts the amount of houses by 1
+								currPlayer.doTransaction(+(HOUSE_COST/2));//refunds half of the value for the house to the player
 								ui.displayString(currPlayer+" demolished a house on "+ DevelopedProperty2);
-								ui.displayBankTransaction(currPlayer);
+								ui.displayBankTransaction(currPlayer);// User interface display
 							 } else {
-									ui.displayError(UI.ERR_DEMOLISH);
+									ui.displayError(UI.ERR_DEMOLISH);//Correct error messages
 								}
 						  
 						  } else {
@@ -298,18 +311,18 @@ public class Monopoly {
 					}
 					break;
 					
-                case UI.CMD_DEMOLISH_HOTEL : 
+                case UI.CMD_DEMOLISH_HOTEL : //Exact same but for hotel instead of house
                 	if (board.isProperty(currPlayer.getPosition())) {
 						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
 				   if (DevelopedProperty2.isOwned()) {
 						if (DevelopedProperty2.getOwner().equals(currPlayer)) {
 						  if(numHouses >= 1){
 								numHotels -= 1;
-								currPlayer.doTransaction(+100);
+								currPlayer.doTransaction(+(HOTEL_COST/2));
 								ui.displayString(currPlayer+" demolished a hotel on "+DevelopedProperty2);
 								ui.displayBankTransaction(currPlayer);
 							 } else {
-									ui.displayError(UI.ERR_DEMOLISH);
+									ui.displayError(UI.ERR_DEMOLISH);//Correct error messages
 								}
 						  
 						  } else {

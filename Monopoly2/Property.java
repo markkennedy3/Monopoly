@@ -45,11 +45,13 @@ public class Property extends Square {
 		return;
 	}
 	
+	//boolean expression to see if there a house present on the site
 	public boolean isHouse (){
 		isHouse = true;
 		return isHouse;
 	}
 	
+	//boolean expression to see if there a hotel present on the site
 	public boolean isHotel (){
 		isHotel = true;
 		return isHotel;

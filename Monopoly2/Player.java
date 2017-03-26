@@ -9,11 +9,11 @@ public class Player {
 	private int amount;
 	private String token;
 	private boolean passedGo;
-	private ArrayList<Property> properties = new ArrayList<Property>();
-	private ArrayList<Property> houses = new ArrayList<Property>();
-	private ArrayList<Property> hotels = new ArrayList<Property>();
-	private ArrayList<Property> developedProperties = new ArrayList<Property>();
-	private ArrayList<Property> developedProperties2 = new ArrayList<Property>();
+	private ArrayList<Property> properties = new ArrayList<Property>();//Array list for propertys
+	private ArrayList<Property> houses = new ArrayList<Property>();//array list for houses
+	private ArrayList<Property> hotels = new ArrayList<Property>();//array list for hotels
+	private ArrayList<Property> developedProperties = new ArrayList<Property>();//array list for propertys with houses
+	private ArrayList<Property> developedProperties2 = new ArrayList<Property>();//array list for propertys with hotels
 	
 	Player (String name, String token) {
 		this.name = name;
@@ -70,14 +70,14 @@ public class Player {
 		return;
 	}
 	
-	public void buildHouse (Property DevelopedProperty){
-		DevelopedProperty.setOwner(this);
+	public void buildHouse (Property DevelopedProperty){//Function to build houses
+		DevelopedProperty.setOwner(this);//adds property with hous to the developedProperty array list
 		houses.add(DevelopedProperty);
-		DevelopedProperty.isHouse();
+		DevelopedProperty.isHouse();//sets boolean expression to true, to indicate that there is a house on this property
 		return;
 	}
 	
-	public void buildHotel (Property DevelopedProperty2){
+	public void buildHotel (Property DevelopedProperty2){//Same but for hotels
 		DevelopedProperty2.setOwner(this);
 		hotels.add(DevelopedProperty2);
 		DevelopedProperty2.isHotel();
@@ -101,6 +101,7 @@ public class Player {
 		return properties; 
 	}
 	
+	//clears all houses
 	public ArrayList<Property> clearHouses () {
 	
 		for (Property DevelopedProperty: houses) {
@@ -109,6 +110,7 @@ public class Player {
 	return	houses;
 	}
 	
+	//clears all hotels
 	public ArrayList<Property> clearHotels () {
 		
 		for (Property DevelopedProperty2: hotels) {

@@ -20,7 +20,7 @@ public class UI {
 	public static final int CMD_BALANCE = 7;
 	public static final int CMD_BANKRUPT = 8;
 	public static final int CMD_HELP = 9;
-	public static final int CMD_BUILD_HOUSE = 10;
+	public static final int CMD_BUILD_HOUSE = 10;//Extra commands
 	public static final int CMD_BUILD_HOTEL = 11;
 	public static final int CMD_DEMOLISH_HOUSE = 12;
 	public static final int CMD_DEMOLISH_HOTEL = 13;
@@ -35,7 +35,7 @@ public class UI {
 	public static final int ERR_IS_OWNED = 7;
 	public static final int ERR_SELF_OWNED = 8;
 	public static final int ERR_RENT_OWED= 9;
-	public static final int ERR_BANKRUPT = 10;
+	public static final int ERR_BANKRUPT = 10;//Extra Errors
 	public static final int ERR_BUILD = 11;
 	public static final int ERR_BUILD_HOTEL = 12;
 	public static final int ERR_HOUSES = 13;
@@ -148,7 +148,7 @@ public class UI {
 					inputValid = true;
 					break;
 				case "bankrupt" :
-					commandId = CMD_BANKRUPT;
+					commandId = CMD_BANKRUPT;//Extra Commands
 					inputValid = true;
 					break;
 				case "help" :
