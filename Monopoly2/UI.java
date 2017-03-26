@@ -8,7 +8,7 @@ public class UI {
 
 	private static final int FRAME_WIDTH = 1200;
 	private static final int FRAME_HEIGHT = 800;
-	private static final String CURRENCY = " pounds";
+	private static final String CURRENCY = " Euros";
 	
 	public static final int CMD_QUIT = 0;
 	public static final int CMD_DONE = 1;
@@ -56,7 +56,7 @@ public class UI {
 		"Error: You owe rent.",
 		"Error: You must declare Bankruptcy",
 		"Error: You cannot build a property",
-		"Error: You do not have enough houses to buils a hotel",
+		"Error: You do not have enough houses to build a hotel",
 		"Error: You already have the max amount of houses on this property",
 		"Error: You already have the max amount of hotels on this property",
 		"Error: You have no buildings here to  demolish",
@@ -74,7 +74,7 @@ public class UI {
 	UI (ArrayList<Player> players) {
 		boardPanel = new BoardPanel(players);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-		frame.setTitle("Monopoly");
+		frame.setTitle("MrPennybag's Monopoly");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(boardPanel, BorderLayout.LINE_START);
 		frame.add(infoPanel, BorderLayout.LINE_END);

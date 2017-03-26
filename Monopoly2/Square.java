@@ -1,7 +1,7 @@
 
 public class Square {
 
-	private String name;
+	String name;
 	
 	Square (String name) {
 		this.name = name;

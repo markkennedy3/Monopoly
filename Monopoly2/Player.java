@@ -71,7 +71,7 @@ public class Player {
 	}
 	
 	public void buildHouse (Property DevelopedProperty){//Function to build houses
-		DevelopedProperty.setOwner(this);//adds property with hous to the developedProperty array list
+		DevelopedProperty.setOwner(this);//adds property with house to the developedProperty array list
 		houses.add(DevelopedProperty);
 		DevelopedProperty.isHouse();//sets boolean expression to true, to indicate that there is a house on this property
 		return;
