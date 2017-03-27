@@ -14,6 +14,8 @@ public class Player {
 	private ArrayList<Property> hotels = new ArrayList<Property>();//array list for hotels
 	private ArrayList<Property> developedProperties = new ArrayList<Property>();//array list for propertys with houses
 	private ArrayList<Property> developedProperties2 = new ArrayList<Property>();//array list for propertys with hotels
+	private ArrayList<Property> mortgagedProperties = new ArrayList<Property>();//array list for mortgaged propertys
+	
 	
 	Player (String name, String token) {
 		this.name = name;
@@ -70,9 +72,17 @@ public class Player {
 		return;
 	}
 	
-	public void soldProperty (Property MortgagedProperty) {
+	public void mortgagedProperty (Property MortgagedProperty) {
 		MortgagedProperty.setOwner(this);
+		mortgagedProperties.add(MortgagedProperty);
 		properties.remove(MortgagedProperty);
+		return;
+	}
+	
+	public void redeemedProperty (Property RedeemedProperty) {
+		RedeemedProperty.setOwner(this);
+		mortgagedProperties.remove(RedeemedProperty);
+		properties.add(RedeemedProperty);
 		return;
 	}
 	
@@ -88,6 +98,10 @@ public class Player {
 		hotels.add(DevelopedProperty2);
 		DevelopedProperty2.isHotel();
 		return;
+	}
+	
+	public ArrayList<Property> getMortgagedProperties () {
+		return mortgagedProperties;
 	}
 	
 	

@@ -28,5 +28,9 @@ public class InfoPanel extends JPanel {
 	public void displayString (String text) {
 		textArea.setText(textArea.getText()+"\n"+text);
 	}
+	
+	public void displayString2 (Player player) {
+		textArea.setText(textArea.getText()+"\n"+player);
+	}
 
 }

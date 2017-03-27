@@ -77,8 +77,12 @@ public class UI {
 	private String string;
 	private boolean done;
 	private int commandId;
+	
+	public static String[] myArray = new String [4];
+	private int y = 0;
 
-	UI (ArrayList<Player> players) {
+	UI (ArrayList<Player> players) 
+	{
 		boardPanel = new BoardPanel(players);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		frame.setTitle("MrPennybag's Monopoly");
@@ -119,8 +123,14 @@ public class UI {
 			infoPanel.displayString("> " + string);
 			string = commandPanel.getString();
 			string = string.toLowerCase();
-			string = string.trim();
-			string = string.replaceAll("( )+", " ");
+			
+			//string = string.trim(); This will only work if command is one word, not what we want for this sprint
+			//string = string.replaceAll("( )+", " ");
+			//for(String x : string.split(" ")){//Splits the string by declaring new String x and stores the split part in x
+				//myArray[y] = x;//Stores the value in the index of y(y is 0 at the start)
+				//y++;//Increments y
+			//}
+			//string = myArray[0];//String is assigned the value of the very first split which will fulfil a case
 			switch (string) {
 				case "quit" :
 					commandId = CMD_QUIT;
@@ -230,6 +240,10 @@ public class UI {
 		return;
 	}
 	
+	public void displayMortgagedProperties (Player player) {
+		infoPanel.displayString2(player);
+		return;
+	}
 	public void displayBankTransaction (Player player) {
 		if (player.getTransaction() >= 0) {
 			infoPanel.displayString(player + " receives " + player.getTransaction() + CURRENCY + " from the bank.");
