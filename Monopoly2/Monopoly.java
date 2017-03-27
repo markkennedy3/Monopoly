@@ -336,8 +336,29 @@ public class Monopoly {
 						ui.displayError(UI.ERR_NOT_A_PROPERTY);
 					}
 					break;
+					
+                case UI.CMD_MORTGAGE :
+                	if (board.isProperty(currPlayer.getPosition())) {
+                		Property MortgagedProperty = board.getProperty(currPlayer.getPosition());
+						if (MortgagedProperty.isOwned()) 
+						{			
+								currPlayer.doTransaction((+MortgagedProperty.getValue())/2);	
+								ui.displayBankTransaction(currPlayer);
+								currPlayer.soldProperty(MortgagedProperty);	
+						} else {
+							ui.displayError(UI.ERR_NOT_OWNED);
+						}
+                	}
+                	else 
+                	{
+						ui.displayError(UI.ERR_NOT_A_PROPERTY);
+					}  //instead of completly removing properties need to moved to a mortaged property list
+					break;		
 						
-						
+                case UI.CMD_REDEEM : 
+				    //In here all that needs to be done is re-add property from portaged property list
+					break;
+					
 				case UI.CMD_QUIT : 
 					turnFinished = true;
 					gameOver = true;

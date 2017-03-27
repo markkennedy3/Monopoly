@@ -24,6 +24,9 @@ public class UI {
 	public static final int CMD_BUILD_HOTEL = 11;
 	public static final int CMD_DEMOLISH_HOUSE = 12;
 	public static final int CMD_DEMOLISH_HOTEL = 13;
+	public static final int CMD_MORTGAGE = 14;
+	public static final int CMD_REDEEM = 15;
+	
 	
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
@@ -42,6 +45,8 @@ public class UI {
 	public static final int ERR_HOTELS = 14;
 	public static final int ERR_DEMOLISH = 15;
 	public static final int ERR_DEMOLISH2 = 16;
+	public static final int ERR_MORTGAGE = 17;
+	public static final int ERR_REDEEM = 18;
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
@@ -61,6 +66,8 @@ public class UI {
 		"Error: You already have the max amount of hotels on this property",
 		"Error: You have no buildings here to  demolish",
 		"Error: You have cannnot demolish a building here",
+		"Error: You cannot mortgage this property",
+		"Error: You cannot redeem this property"
 	};
 	
 	private JFrame frame = new JFrame();
@@ -169,6 +176,14 @@ public class UI {
 					break;
 				case "demolish hotel" :
 					commandId = CMD_DEMOLISH_HOTEL;
+					inputValid = true;
+					break;
+				case "mortgage" :
+					commandId = CMD_MORTGAGE;
+					inputValid = true;
+					break;
+				case "redeem" :
+					commandId = CMD_REDEEM;
 					inputValid = true;
 					break;
 				default:

@@ -70,6 +70,12 @@ public class Player {
 		return;
 	}
 	
+	public void soldProperty (Property MortgagedProperty) {
+		MortgagedProperty.setOwner(this);
+		properties.remove(MortgagedProperty);
+		return;
+	}
+	
 	public void buildHouse (Property DevelopedProperty){//Function to build houses
 		DevelopedProperty.setOwner(this);//adds property with house to the developedProperty array list
 		houses.add(DevelopedProperty);
