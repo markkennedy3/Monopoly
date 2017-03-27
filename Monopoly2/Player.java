@@ -9,6 +9,7 @@ public class Player {
 	private int amount;
 	private String token;
 	private boolean passedGo;
+	private int numHouses = 0;
 	private ArrayList<Property> properties = new ArrayList<Property>();//Array list for propertys
 	private ArrayList<Property> houses = new ArrayList<Property>();//array list for houses
 	private ArrayList<Property> hotels = new ArrayList<Property>();//array list for hotels

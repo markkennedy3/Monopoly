@@ -26,6 +26,7 @@ public class UI {
 	public static final int CMD_DEMOLISH_HOTEL = 13;
 	public static final int CMD_MORTGAGE = 14;
 	public static final int CMD_REDEEM = 15;
+	public static final int CMD_ENQUIRE = 16;
 	
 	
 	public static final int ERR_SYNTAX = 0;
@@ -72,14 +73,14 @@ public class UI {
 	
 	private JFrame frame = new JFrame();
 	private BoardPanel boardPanel;	
-	private InfoPanel infoPanel = new InfoPanel();
-	private CommandPanel commandPanel = new CommandPanel();
+	public InfoPanel infoPanel = new InfoPanel();
+	public CommandPanel commandPanel = new CommandPanel();
 	private String string;
 	private boolean done;
 	private int commandId;
+	private int y;
 	
 	public static String[] myArray = new String [4];
-	private int y = 0;
 
 	UI (ArrayList<Player> players) 
 	{
@@ -126,11 +127,11 @@ public class UI {
 			
 			//string = string.trim(); This will only work if command is one word, not what we want for this sprint
 			//string = string.replaceAll("( )+", " ");
-			//for(String x : string.split(" ")){//Splits the string by declaring new String x and stores the split part in x
-				//myArray[y] = x;//Stores the value in the index of y(y is 0 at the start)
-				//y++;//Increments y
-			//}
-			//string = myArray[0];//String is assigned the value of the very first split which will fulfil a case
+			for(String x : string.split(" ")){//Splits the string by declaring new String x and stores the split part in x
+				myArray[y] = x;//Stores the value in the index of y(y is 0 at the start)
+				y++;//Increments y
+	       	}
+			string = myArray[0];//String is assigned the value of the very first split which will fulfil a case
 			switch (string) {
 				case "quit" :
 					commandId = CMD_QUIT;
@@ -194,6 +195,10 @@ public class UI {
 					break;
 				case "redeem" :
 					commandId = CMD_REDEEM;
+					inputValid = true;
+					break;
+				case "enquire" :
+					commandId = CMD_ENQUIRE;
 					inputValid = true;
 					break;
 				default:
@@ -279,7 +284,7 @@ public class UI {
 	}
 	
 	public void displayCommandHelp () {
-		infoPanel.displayString("Available commands: roll, pay rent, buy, property, balance, build house, build hotel, bankrupt, done, quit. ");
+		infoPanel.displayString("Available commands: roll, pay rent, buy, property, balance, build house, build hotel, demolish house, demolish hotel, mortgage, redeem bankrupt, done, quit. ");
 		return;
 	}
 	

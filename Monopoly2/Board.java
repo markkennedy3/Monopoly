@@ -5,7 +5,7 @@ public class Board {
 	
 	public static final int NUM_SQUARES = 40;
 		
-	private Square[] squares = new Square[NUM_SQUARES];
+	static Square[] squares = new Square[NUM_SQUARES];
 	
 	Board () {
 		squares[0] = new Square("Go");
@@ -52,19 +52,12 @@ public class Board {
 		return;
 	}
 	
-	/*private Colourgroups[] colourgroups = new Colourgroups[14];
-	{
-		colourgroups[0] = new Colourgroups(BikeShop,AIB);
-		colourgroups[1] = new Colourgroups(Centra,Glenomena,Merville);
-	}
-	
-	public Colourgroups getColourgroup ()
-	{
-		return colourgroups;
-	}*/
-	
 	public Square getSquare (int index) {
 		return squares[index];
+	}
+	
+	public String getName (String name){
+		return name;
 	}
 	
 	public Property getProperty (int index) {

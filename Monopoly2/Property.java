@@ -16,6 +16,10 @@ public class Property extends Square {
 		return;
 	}
 	
+	public String getName () {
+		return name;
+	}
+	
 	public int getValue () {
 		return value;
 	}

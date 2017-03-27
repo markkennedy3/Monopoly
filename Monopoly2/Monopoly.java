@@ -22,6 +22,8 @@ public class Monopoly {
 	Property DevelopedProperty2;//array of property with hotels on it 
 	private int numHouses = 0;// Initalised number of houses on a property 
 	private int numHotels = 0;// Initalised number of houses on a property 
+	private String string;
+	public String name;
 	
 	Monopoly () {
 		numPlayers = 0;
@@ -376,6 +378,23 @@ public class Monopoly {
 				case UI.CMD_QUIT : 
 					turnFinished = true;
 					gameOver = true;
+					break;
+				
+				case UI.CMD_ENQUIRE : 
+					ui.infoPanel.displayString(currPlayer + "Enter street name here:");
+					ui.commandPanel.inputString();
+					string = ui.commandPanel.getString();
+					ui.infoPanel.displayString("> " + string);
+					string = ui.commandPanel.getString();
+					
+					for(int s = 0; s < 40; s++){
+						if(Board.squares[s].name.equals(string)){
+							ui.infoPanel.displayString("> " + true);}
+						else{
+						      ui.infoPanel.displayString("> " + false);
+						return;}
+						turnFinished=false;
+						}
 					break;
 			}
 		} while (!turnFinished);
