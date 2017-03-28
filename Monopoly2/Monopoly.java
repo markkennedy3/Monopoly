@@ -22,7 +22,7 @@ public class Monopoly {
 	Property DevelopedProperty2;//array of property with hotels on it 
 	private int numHouses = 0;// Initalised number of houses on a property 
 	private int numHotels = 0;// Initalised number of houses on a property 
-	private String string;
+	private String string; //searching properties by their name//
 	public String name;
 	
 	Monopoly () {
@@ -224,18 +224,18 @@ public class Monopoly {
 					turnFinished = true; //finishes the current players turn
 					break;	
 				case UI.CMD_BUILD_HOUSE : 
-				if (board.isProperty(currPlayer.getPosition())) {
+				if (board.isProperty(currPlayer.getPosition())) { //checks if its a property
 						Property DevelopedProperty = board.getProperty(currPlayer.getPosition());
-				   if (DevelopedProperty.isOwned()) {
-						if (DevelopedProperty.getOwner().equals(currPlayer)) {
-						  if(numHouses < 4){
+				   if (DevelopedProperty.isOwned()) { //checks if owned
+						if (DevelopedProperty.getOwner().equals(currPlayer)) { //checks if current player owns property
+						  if(numHouses < 4){ //no more than 4 houses
 							if (currPlayer.getBalance() >= HOUSE_COST) {				
-								currPlayer.doTransaction(-HOUSE_COST);
+								currPlayer.doTransaction(-HOUSE_COST); //minuses cost of house from balance
 								ui.displayBankTransaction(currPlayer);
 								currPlayer.buildHouse(DevelopedProperty);
-								numHouses += 1;
+								numHouses += 1; //increments no.of houses by one
 								ui.displayString(currPlayer+" built a house on "+ DevelopedProperty);
-							} else {
+							} else { //correct error reports
 								ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
 							}
 						  } else {
@@ -254,19 +254,19 @@ public class Monopoly {
 					break;
 					
 				case UI.CMD_BUILD_HOTEL : 
-					if (board.isProperty(currPlayer.getPosition())) {
+					if (board.isProperty(currPlayer.getPosition())) { //checks if its a property
 						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
-				   if (DevelopedProperty2.isOwned()) {
-						if (DevelopedProperty2.getOwner().equals(currPlayer)) {
-						  if(numHouses == 4){
+				   if (DevelopedProperty2.isOwned()) { //checks if owned
+						if (DevelopedProperty2.getOwner().equals(currPlayer)) { //checks if current player owns property
+						  if(numHouses == 4){ //no more than 4 houses
 							  if(numHotels == 1){
 							if (currPlayer.getBalance() >= HOTEL_COST) {				
-								currPlayer.doTransaction(-HOTEL_COST);
+								currPlayer.doTransaction(-HOTEL_COST); //minuses cost of house from balance
 								ui.displayBankTransaction(currPlayer);
 								currPlayer.buildHotel(DevelopedProperty2);
-								numHotels += 1;
+								numHotels += 1; //increments no.of houses by one
 								ui.displayString(currPlayer+" built a hotel on "+ DevelopedProperty2);
-							} else {
+							} else { //correct error reports
 								ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
 							}
 							   } else {
@@ -340,15 +340,15 @@ public class Monopoly {
 					break;
 					
                 case UI.CMD_MORTGAGE :
-                	if (board.isProperty(currPlayer.getPosition())) {
+                	if (board.isProperty(currPlayer.getPosition())) { //gets players current position
                 		Property MortgagedProperty = board.getProperty(currPlayer.getPosition());
-						if (MortgagedProperty.isOwned()) 
+						if (MortgagedProperty.isOwned()) //checks if owned
 						{			
-								currPlayer.doTransaction((+MortgagedProperty.getValue())/2);	
-								ui.displayBankTransaction(currPlayer);
+								currPlayer.doTransaction((+MortgagedProperty.getValue())/2); //adds 50% of the value of the property to current player balance
+								ui.displayBankTransaction(currPlayer); //displays bank balance
 								ui.displayMortgagedProperties(currPlayer);
-								currPlayer.mortgagedProperty(MortgagedProperty);	
-						} else {
+								currPlayer.mortgagedProperty(MortgagedProperty); //adds it to morgaged property list	
+						} else { //correct error messages
 							ui.displayError(UI.ERR_NOT_OWNED);
 						}
                 	}
@@ -356,19 +356,19 @@ public class Monopoly {
                 	{
 						ui.displayError(UI.ERR_NOT_A_PROPERTY);
 					} 
-					break;		
+					break;	
 						
                 case UI.CMD_REDEEM : 
-                	if (board.isProperty(currPlayer.getPosition())){
+                	if (board.isProperty(currPlayer.getPosition())){ //gets players current position
                 		Property RedeemedProperty = board.getProperty(currPlayer.getPosition());{
-                			if (RedeemedProperty.isOwned())
+                			if (RedeemedProperty.isOwned()) //checks if owned
                 			{
-                				currPlayer.doTransaction((-RedeemedProperty.getValue())/2);
-                				ui.displayBankTransaction(currPlayer);
-                				currPlayer.redeemedProperty(RedeemedProperty);
+                				currPlayer.doTransaction((-RedeemedProperty.getValue())/2); //adds 50% of the value of the property to current player balance
+                				ui.displayBankTransaction(currPlayer); //displays bank balance
+                				currPlayer.redeemedProperty(RedeemedProperty); //adds back to owned property list
                 				
                 			}
-                			else {
+                			else { //correct error messages
     							ui.displayError(UI.ERR_NOT_OWNED);
     						}
                 		}
@@ -379,7 +379,6 @@ public class Monopoly {
 					turnFinished = true;
 					gameOver = true;
 					break;
-				
 				case UI.CMD_ENQUIRE : 
 					ui.infoPanel.displayString(currPlayer + "Enter street name here:");
 					ui.commandPanel.inputString();
@@ -387,14 +386,14 @@ public class Monopoly {
 					ui.infoPanel.displayString("> " + string);
 					string = ui.commandPanel.getString();
 					
-					for(int s = 0; s < 40; s++){
+					for(int s = 0; s < 40; s++){/*
 						if(Board.squares[s].name.equals(string)){
 							ui.infoPanel.displayString("> " + true);}
 						else{
 						      ui.infoPanel.displayString("> " + false);
 						return;}
 						turnFinished=false;
-						}
+						*/}
 					break;
 			}
 		} while (!turnFinished);

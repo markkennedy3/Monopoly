@@ -29,7 +29,7 @@ class BoardPanel extends JPanel {
 		setPreferredSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
 		setBackground(Color.WHITE);
 		try {
-			boardImage = ImageIO.read(this.getClass().getResource("board.png"));
+			boardImage = ImageIO.read(this.getClass().getResource("board.png")); //followed JAR instructions for easy compilation
 			
 		} catch (IOException ex) {
 			System.out.println("Could not find the image file " + ex.toString());

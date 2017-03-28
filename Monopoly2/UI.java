@@ -8,8 +8,8 @@ public class UI {
 
 	private static final int FRAME_WIDTH = 1200;
 	private static final int FRAME_HEIGHT = 800;
-	private static final String CURRENCY = " Euros";
-	
+	private static final String CURRENCY = " Euros"; 
+	//added extra commands
 	public static final int CMD_QUIT = 0;
 	public static final int CMD_DONE = 1;
 	public static final int CMD_ROLL = 2;
@@ -28,7 +28,7 @@ public class UI {
 	public static final int CMD_REDEEM = 15;
 	public static final int CMD_ENQUIRE = 16;
 	
-	
+	//added extra error messages
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
 	public static final int ERR_NO_ROLL = 2;
@@ -125,13 +125,13 @@ public class UI {
 			string = commandPanel.getString();
 			string = string.toLowerCase();
 			
-			//string = string.trim(); This will only work if command is one word, not what we want for this sprint
+			/*string = string.trim(); This will only work if command is one word, not what we want for this sprint
 			//string = string.replaceAll("( )+", " ");
 			for(String x : string.split(" ")){//Splits the string by declaring new String x and stores the split part in x
 				myArray[y] = x;//Stores the value in the index of y(y is 0 at the start)
 				y++;//Increments y
 	       	}
-			string = myArray[0];//String is assigned the value of the very first split which will fulfil a case
+			string = myArray[0];*/ //String is assigned the value of the very first split which will fulfil a case
 			switch (string) {
 				case "quit" :
 					commandId = CMD_QUIT;
@@ -245,10 +245,10 @@ public class UI {
 		return;
 	}
 	
-	public void displayMortgagedProperties (Player player) {
-		infoPanel.displayString2(player);
-		return;
-	}
+	 public void displayMortgagedProperties (Player player) {
+		infoPanel.displayString2(player); //displays mortgaged properties
+		return;}
+	
 	public void displayBankTransaction (Player player) {
 		if (player.getTransaction() >= 0) {
 			infoPanel.displayString(player + " receives " + player.getTransaction() + CURRENCY + " from the bank.");

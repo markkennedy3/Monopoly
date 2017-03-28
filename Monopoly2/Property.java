@@ -8,16 +8,12 @@ public class Property extends Square {
 	private int rent[];
 	private Player owner;
 	
-	Property (String name, int value, int[] rent) {
-		super(name);
+	Property (String name,String colour, int value, int[] rent) {
+		super(name,colour);
 		this.value = value;
 		this.rent = rent;
 		isOwned = false;
 		return;
-	}
-	
-	public String getName () {
-		return name;
 	}
 	
 	public int getValue () {

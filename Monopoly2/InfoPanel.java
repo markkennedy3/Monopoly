@@ -28,8 +28,7 @@ public class InfoPanel extends JPanel {
 	public void displayString (String text) {
 		textArea.setText(textArea.getText()+"\n"+text);
 	}
-	
-	public void displayString2 (Player player) {
+	public void displayString2 (Player player) { //was use to display a list of mortgaged projects//
 		textArea.setText(textArea.getText()+"\n"+player);
 	}
 

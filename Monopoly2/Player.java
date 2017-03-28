@@ -9,7 +9,6 @@ public class Player {
 	private int amount;
 	private String token;
 	private boolean passedGo;
-	private int numHouses = 0;
 	private ArrayList<Property> properties = new ArrayList<Property>();//Array list for propertys
 	private ArrayList<Property> houses = new ArrayList<Property>();//array list for houses
 	private ArrayList<Property> hotels = new ArrayList<Property>();//array list for hotels
@@ -75,15 +74,15 @@ public class Player {
 	
 	public void mortgagedProperty (Property MortgagedProperty) {
 		MortgagedProperty.setOwner(this);
-		mortgagedProperties.add(MortgagedProperty);
-		properties.remove(MortgagedProperty);
+		mortgagedProperties.add(MortgagedProperty); //adds it to mortgage property list
+		properties.remove(MortgagedProperty); //removes it from property list
 		return;
 	}
 	
 	public void redeemedProperty (Property RedeemedProperty) {
 		RedeemedProperty.setOwner(this);
-		mortgagedProperties.remove(RedeemedProperty);
-		properties.add(RedeemedProperty);
+		mortgagedProperties.remove(RedeemedProperty); //removes from mortgaged property list
+		properties.add(RedeemedProperty); //removes it from property list
 		return;
 	}
 	
@@ -96,7 +95,7 @@ public class Player {
 	
 	public void buildHotel (Property DevelopedProperty2){//Same but for hotels
 		DevelopedProperty2.setOwner(this);
-		hotels.add(DevelopedProperty2);
+		hotels.add(DevelopedProperty2); //adds to hotels
 		DevelopedProperty2.isHotel();
 		return;
 	}
