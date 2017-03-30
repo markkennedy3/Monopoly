@@ -8,8 +8,8 @@ public class UI {
 
 	private static final int FRAME_WIDTH = 1200;
 	private static final int FRAME_HEIGHT = 800;
-	private static final String CURRENCY = " Euros"; 
-	//added extra commands
+	private static final String CURRENCY = " Euros";
+	
 	public static final int CMD_QUIT = 0;
 	public static final int CMD_DONE = 1;
 	public static final int CMD_ROLL = 2;
@@ -20,15 +20,13 @@ public class UI {
 	public static final int CMD_BALANCE = 7;
 	public static final int CMD_BANKRUPT = 8;
 	public static final int CMD_HELP = 9;
-	public static final int CMD_BUILD_HOUSE = 10;//Extra commands
-	public static final int CMD_BUILD_HOTEL = 11;
-	public static final int CMD_DEMOLISH_HOUSE = 12;
-	public static final int CMD_DEMOLISH_HOTEL = 13;
-	public static final int CMD_MORTGAGE = 14;
+	public static final int CMD_OFFER = 10;
+	public static final int CMD_MORTGAGE = 11;
+	public static final int CMD_BUILD = 12;
+	public static final int CMD_SELL = 14;
 	public static final int CMD_REDEEM = 15;
-	public static final int CMD_ENQUIRE = 16;
+	public static final int CMD_DEMOLISH = 16;
 	
-	//added extra error messages
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
 	public static final int ERR_NO_ROLL = 2;
@@ -39,15 +37,17 @@ public class UI {
 	public static final int ERR_IS_OWNED = 7;
 	public static final int ERR_SELF_OWNED = 8;
 	public static final int ERR_RENT_OWED= 9;
-	public static final int ERR_BANKRUPT = 10;//Extra Errors
-	public static final int ERR_BUILD = 11;
-	public static final int ERR_BUILD_HOTEL = 12;
-	public static final int ERR_HOUSES = 13;
-	public static final int ERR_HOTELS = 14;
-	public static final int ERR_DEMOLISH = 15;
-	public static final int ERR_DEMOLISH2 = 16;
-	public static final int ERR_MORTGAGE = 17;
-	public static final int ERR_REDEEM = 18;
+	public static final int ERR_NOT_A_NAME = 10;
+	public static final int ERR_TOO_MANY_BUILDINGS = 11;
+	public static final int ERR_NOT_A_SITE = 12;
+	public static final int ERR_NOT_YOURS = 13;
+	public static final int ERR_TOO_FEW_BUILDINGS = 14;
+	public static final int ERR_DOES_NOT_HAVE_GROUP = 15;
+	public static final int ERR_DUPLICATE = 16;
+	public static final int ERR_HAS_BUILDINGS = 17;
+	public static final int ERR_IS_MORTGAGED = 18;
+	public static final int ERR_IS_NOT_MORTGAGED = 19;
+	public static final int SITE_IS_MORTGAGED = 20;
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
@@ -60,31 +60,36 @@ public class UI {
 		"Error: The property is already owned.",
 		"Error: You own the property.",
 		"Error: You owe rent.",
-		"Error: You must declare Bankruptcy",
-		"Error: You cannot build a property",
-		"Error: You do not have enough houses to build a hotel",
-		"Error: You already have the max amount of houses on this property",
-		"Error: You already have the max amount of hotels on this property",
-		"Error: You have no buildings here to  demolish",
-		"Error: You have cannnot demolish a building here",
-		"Error: You cannot mortgage this property",
-		"Error: You cannot redeem this property"
+		"Error: Not a name.",
+		"Error: Too many units.",
+		"Error: That property is not a site.",
+		"Error: You do not own that property.",
+		"Error: Must be one or more units",
+		"Error: You do not own the whole colour group.",
+		"Error: Duplicate name.",
+		"Error: The site has units on it.",
+		"Error: The property has already been mortgaged.",
+		"Error: The property has not been mortgaged.",
+		"Error: The property has been mortgaged."
 	};
 	
 	private JFrame frame = new JFrame();
 	private BoardPanel boardPanel;	
-	public InfoPanel infoPanel = new InfoPanel();
-	public CommandPanel commandPanel = new CommandPanel();
+	private InfoPanel infoPanel = new InfoPanel();
+	private CommandPanel commandPanel = new CommandPanel();
 	private String string;
 	private boolean done;
 	private int commandId;
-	private int y;
-	
-	public static String[] myArray = new String [4];
+	private Board board;
+	private Players players;
+	private Property inputProperty;
+	private int inputNumber;
+	private Player inputPlayer;
 
-	UI (ArrayList<Player> players) 
-	{
-		boardPanel = new BoardPanel(players);
+	UI (Players players, Board board) {
+		this.players = players;
+		this.board = board;
+		boardPanel = new BoardPanel(this.players);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
 		frame.setTitle("MrPennybag's Monopoly");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -96,23 +101,49 @@ public class UI {
 		return;
 	}
 
-// INPUT METHODS
+//  METHODS DEALING WITH USER INPUT
 	
 	public void inputName (int numPlayers) {
+		boolean inputValid = false;
 		if (numPlayers == 0) {
 			infoPanel.displayString("Enter new player name (" + boardPanel.getTokenName(numPlayers) + "):");			
 		} else {
 			infoPanel.displayString("Enter new player name (" + boardPanel.getTokenName(numPlayers)  +  ") or done:");
 		}
-		commandPanel.inputString();
-		string = commandPanel.getString();
-		if ( (numPlayers > 0) && (string.trim().toLowerCase().equals("done")) ) {
-			done = true;
-		} else {
-			done = false;
-		}
-		infoPanel.displayString("> " + string);
+		do {
+			commandPanel.inputString();
+			string = commandPanel.getString();
+			string = string.trim();
+			if (string.length()==0) {
+				inputValid = false;
+				done = false;
+			} else if ( (numPlayers > 0) && (string.toLowerCase().equals("done")) ) {
+				inputValid = true;
+				done = true;
+			} else if (string.contains(" ")) {
+				inputValid = false;
+				done = false;
+			} else {
+				inputValid = true;
+			}
+			infoPanel.displayString("> " + string);
+			if (!inputValid) {
+				displayError(ERR_NOT_A_NAME);
+			}
+		} while (!inputValid);
 		return;
+	}
+	
+	private boolean hasNoArgument (String[] words) {
+		return (words.length == 1);
+	}
+	
+	private boolean hasOneArgument (String[] words) {
+		return (words.length == 2);
+	}	
+
+	private boolean hasTwoArguments (String[] words) {
+		return (words.length==3);
 	}
 	
 	public void inputCommand (Player player) {
@@ -124,83 +155,89 @@ public class UI {
 			infoPanel.displayString("> " + string);
 			string = commandPanel.getString();
 			string = string.toLowerCase();
-			
-			/*string = string.trim(); This will only work if command is one word, not what we want for this sprint
-			//string = string.replaceAll("( )+", " ");
-			for(String x : string.split(" ")){//Splits the string by declaring new String x and stores the split part in x
-				myArray[y] = x;//Stores the value in the index of y(y is 0 at the start)
-				y++;//Increments y
-	       	}
-			string = myArray[0];*/ //String is assigned the value of the very first split which will fulfil a case
-			switch (string) {
+			string = string.trim();
+			string = string.replaceAll("( )+", " ");
+			String[] words = string.split(" ");
+			switch (words[0]) {
 				case "quit" :
 					commandId = CMD_QUIT;
-					inputValid = true;
+					inputValid = hasNoArgument(words);
 					break;
 				case "done" :
 					commandId = CMD_DONE;
-					inputValid = true;
+					inputValid = hasNoArgument(words);
 					break;
 				case "roll" :
 					commandId = CMD_ROLL;
-					inputValid = true;
+					inputValid = hasNoArgument(words);
 					break;
 				case "buy" :
-					commandId = CMD_BUY;				
-					inputValid = true;
+					commandId = CMD_BUY;
+					inputValid = hasNoArgument(words);
 					break;
-				case "pay rent" :
+				case "pay" :
 					commandId = CMD_PAY_RENT;
-					inputValid = true;
-					break;
-				case "auction" :
-					commandId = CMD_AUCTION;
-					inputValid = true;
+					if (hasOneArgument(words) && words[1].equals("rent")) {
+						inputValid = true;
+					} else {
+						inputValid = false;
+					}
 					break;
 				case "property" :
 					commandId = CMD_PROPERTY;
-					inputValid = true;
+					inputValid = hasNoArgument(words);
 					break;
 				case "balance" :
 					commandId = CMD_BALANCE;
-					inputValid = true;
+					inputValid = hasNoArgument(words);
 					break;
 				case "bankrupt" :
-					commandId = CMD_BANKRUPT;//Extra Commands
-					inputValid = true;
-					break;
-				case "help" :
-					commandId = CMD_HELP;
-					inputValid = true;
-					break;
-				case "build house" :
-					commandId = CMD_BUILD_HOUSE;
-					inputValid = true;
-					break;
-				case "build hotel" :
-					commandId = CMD_BUILD_HOTEL;
-					inputValid = true;
-					break;
-				case "demolish house" :
-					commandId = CMD_DEMOLISH_HOUSE;
-					inputValid = true;
-					break;
-				case "demolish hotel" :
-					commandId = CMD_DEMOLISH_HOTEL;
-					inputValid = true;
+					commandId = CMD_BANKRUPT;
+					inputValid = hasNoArgument(words);
 					break;
 				case "mortgage" :
 					commandId = CMD_MORTGAGE;
-					inputValid = true;
+					if (hasOneArgument(words) && board.isProperty(words[1])) { 
+						inputProperty = board.getProperty(words[1]);
+						inputValid = true;
+					} else {
+						inputValid = false;
+					}
 					break;
 				case "redeem" :
 					commandId = CMD_REDEEM;
-					inputValid = true;
+					if (hasOneArgument(words) && board.isProperty(words[1])) { 
+						inputProperty = board.getProperty(words[1]);
+						inputValid = true;
+					} else {
+						inputValid = false;
+					}
 					break;
-				case "enquire" :
-					commandId = CMD_ENQUIRE;
-					inputValid = true;
+				case "build" :
+					commandId = CMD_BUILD;
+					if (hasTwoArguments(words) && board.isSite(words[1]) && words[2].matches("[0-9]+")) { 
+						inputProperty = board.getProperty(words[1]);
+						inputNumber = Integer.parseInt(words[2]);
+						inputValid = true;
+					} else {
+						inputValid = false;
+					}
 					break;
+				case "demolish" :
+					commandId = CMD_DEMOLISH;
+					if (hasTwoArguments(words) && board.isSite(words[1]) && words[2].matches("[0-9]+")) { 
+						inputProperty = board.getProperty(words[1]);
+						inputNumber = Integer.parseInt(words[2]);
+						inputValid = true;
+					} else {
+						inputValid = false;
+					}
+					break;					
+				case "help" :
+					commandId = CMD_HELP;
+					inputValid = hasNoArgument(words);
+					break;
+				
 				default:
 					inputValid = false;
 				}
@@ -232,8 +269,20 @@ public class UI {
 		return done;
 	}
 	
+	public Property getInputProperty () {
+		return inputProperty;
+	}
 	
-// OUTPUT METHODS
+	public Player getInputPlayer () {
+		return inputPlayer;
+	}
+	
+	public int getInputNumber () {
+		return inputNumber;
+	}
+	
+	
+// DISPLAY METHODS
 	
 	public void display () {
 		boardPanel.refresh();
@@ -244,10 +293,6 @@ public class UI {
 		infoPanel.displayString(string);
 		return;
 	}
-	
-	 public void displayMortgagedProperties (Player player) {
-		infoPanel.displayString2(player); //displays mortgaged properties
-		return;}
 	
 	public void displayBankTransaction (Player player) {
 		if (player.getTransaction() >= 0) {
@@ -284,7 +329,7 @@ public class UI {
 	}
 	
 	public void displayCommandHelp () {
-		infoPanel.displayString("Available commands: roll, pay rent, buy, property, balance, build house, build hotel, demolish house, demolish hotel, mortgage, redeem bankrupt, done, quit. ");
+		infoPanel.displayString("Available commands: roll, buy, pay rent, build, demolish, mortgage, redeem, bankrupt, property, balance, done, quit. ");
 		return;
 	}
 	
@@ -305,7 +350,6 @@ public class UI {
 	
 	public void displayLatestProperty (Player player) {
 		infoPanel.displayString(player + " bought " + player.getLatestProperty());
-		return;
 	}
 	
 	public void displayProperty (Player player) {
@@ -315,35 +359,76 @@ public class UI {
 		} else {
 			infoPanel.displayString(player + " owns the following property...");
 			for (Property p : propertyList) {
-				infoPanel.displayString(p.getName() + ", rent " + p.getRent());				
+				String mortgageStatus = "";
+				if (p.isMortgaged()) {
+					mortgageStatus = ", is mortgaged";
+				}
+				if (p instanceof Site) {
+					Site site = (Site) p;
+					String buildStatus = "";
+					if (site.getNumBuildings()==0) {
+						buildStatus = "with no buildings";
+					} else if (site.getNumBuildings()==1) {
+						buildStatus = "with 1 house";
+					} else if (site.getNumBuildings()<5) {
+						buildStatus = "with " + site.getNumBuildings() + " houses";
+					} else if (site.getNumBuildings()==5) {
+						buildStatus = "with a hotel";
+					}
+					infoPanel.displayString(site + " (" + site.getColourGroup().getName() + "), rent " + site.getRent() + CURRENCY + ", " + buildStatus + mortgageStatus + ".");		
+				} else if (p instanceof Station) {
+					infoPanel.displayString(p + ", rent " + p.getRent() + CURRENCY + mortgageStatus + ".");	
+				} else if (p instanceof Utility) {
+					infoPanel.displayString(p + ", rent " + ((Utility) p).getRentMultiplier() + " times dice" + mortgageStatus + ".");
+				}
 			}
 		}
 	}
 	
-	//Function which displays the properties which will be returned to the bank
-	//when a player goes bankrupt.
-	public void displayReturnedProperties (Player player) { 
-		ArrayList<Property> propertyList = player.getProperties();
-		if (propertyList.size() == 0) {
-			return;
-		} else {
-			infoPanel.displayString(player + " returned the following properties to the Bank...");
-			for (Property p : propertyList) {
-				infoPanel.displayString(p.getName());				
-		     }
-		   }
-		}
-	
-	public void displaySquare (Player player, Board board) {
-		infoPanel.displayString(player + " arrives at " + board.getSquare(player.getPosition()).getName() + ".");
-		if (board.isProperty(player.getPosition())) {
-			Property property = board.getProperty(player.getPosition());
+	public void displaySquare (Player player, Board board, Dice dice) {
+		Square square = board.getSquare(player.getPosition());
+		infoPanel.displayString(player + " arrives at " + square.getName() + ".");
+		if (square instanceof Property) {
+			Property property = (Property) square;
 			if (property.isOwned()) {
 				infoPanel.displayString("The property is owned by " + property.getOwner() + ". Rent is " + property.getRent() + CURRENCY + ".");				
 			} else {
-				infoPanel.displayString("The property is not owned. Rent is " + property.getRent() + CURRENCY + ".");								
+				infoPanel.displayString("The property is not owned.");								
 			}
 		}
+		return;
+	}
+	
+	public void displayBuild (Player player, Site site, int numUnits) {
+		if (numUnits==1) {
+			infoPanel.displayString(player + " builds 1 unit on " + site);			
+		} else {
+			infoPanel.displayString(player + " builds " + numUnits + " units on " + site);
+		}
+		return;
+	}
+	
+	public void displayDemolish (Player player, Site site, int numUnits) {
+		if (numUnits==1) {
+			infoPanel.displayString(player + " demolishes 1 unit on " + site);			
+		} else {
+			infoPanel.displayString(player + " demolishes " + numUnits + " units on " + site);
+		}
+		return;
+	}	
+	
+	public void displayBankrupt (Player player) {
+		infoPanel.displayString(player + " is bankrupt.");
+		return;
+	}
+	
+	public void displayMortgage (Player player, Property property) {
+		infoPanel.displayString(player + " mortgages " + property + " for " + property.getMortgageValue() + CURRENCY);
+		return;				
+	}
+	
+	public void displayMortgageRedemption (Player player, Property property) {
+		infoPanel.displayString(player + " redeems " + property + " for " + property.getMortgageRemptionPrice() + CURRENCY);
 		return;
 	}
 	

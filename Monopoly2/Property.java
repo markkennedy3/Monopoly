@@ -1,60 +1,92 @@
 
 public class Property extends Square {
 
-	private boolean isOwned;
-	private boolean isHouse;
-	private boolean isHotel;
-	private int value;
-	private int rent[];
-	private Player owner;
+	private static final float MORTGAGE_PREMIUM = 1.1f;
 	
-	Property (String name,String colour, int value, int[] rent) {
-		super(name,colour);
-		this.value = value;
-		this.rent = rent;
+	private boolean isOwned;
+	public int price;
+	private Player owner;
+	private String shortName;
+	private boolean mortgaged;
+	private int mortgageValue;
+	
+	Property (String name, int price, String shortName, int mortgageValue) {
+		super(name);
+		this.price = price;
+		this.shortName = shortName;
 		isOwned = false;
+		owner = null;
+		mortgaged = false;
+		this.mortgageValue = mortgageValue;
 		return;
 	}
-	
-	public int getValue () {
-		return value;
+		
+// METHODS DEALING WITH PRICE
+
+	public int getPrice () {
+		return price;
 	}
 	
-	public int getRent () {
-		return rent[0];
+// METHODS DEALING WITH RENT : 	
+
+	public int getRent () { // this method is overloaded by the subclasses
+		return 0;  
+	}
+	
+// METHODS DEALING WITH OWNERSHIP
+	
+	public Player getOwner () {
+		return owner;
 	}
 	
 	public boolean isOwned () {
 		return isOwned;
 	}
 	
-	public void setOwner (Player inPlayer) {
-		owner = inPlayer;
+	public void setOwner (Player player) {
+		owner = player;
 		isOwned = true;
 		return;
 	}
 	
-	public Player getOwner () {
-		return owner;
-	}
-	
-	//Function which removes the current player as owner of a property
-	public void removeOwner (Player inPlayer) {
-		owner = inPlayer;
+	public void releaseOwnership () {
 		isOwned = false;
+		owner = null;
+		mortgaged = false;
 		return;
 	}
 	
-	//boolean expression to see if there a house present on the site
-	public boolean isHouse (){
-		isHouse = true;
-		return isHouse;
+// METHODS DEALING WITH MORTGAGES
+	
+	public void setMortgaged() {
+		mortgaged = true;
+		return;
 	}
 	
-	//boolean expression to see if there a hotel present on the site
-	public boolean isHotel (){
-		isHotel = true;
-		return isHotel;
+	public boolean isMortgaged() {
+		return mortgaged;
 	}
 	
+	public void setNotMortgaged() {
+		mortgaged = false;
+		return;
+	}
+	
+	public int getMortgageValue() {
+		return mortgageValue;
+	}
+	
+	public int getMortgageRemptionPrice () {
+		return (int) (((float) mortgageValue) * MORTGAGE_PREMIUM);
+	}
+	
+// COMMON JAVA METHODS	
+	
+	public boolean equals (String string) {
+		return shortName.equals(string);
+	}
+	
+	public String toString () {
+		return super.toString();
+	}
 }

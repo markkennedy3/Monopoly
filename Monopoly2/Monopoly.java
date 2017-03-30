@@ -1,50 +1,52 @@
 import java.util.ArrayList;
 
+
 public class Monopoly {
 
-	public static final int MAX_NUM_PLAYERS = 6;
 	private static final int START_MONEY = 1500;
 	private static final int GO_MONEY = 200;
-	private static final int HOUSE_COST = 200;//VALUES
-	private static final int HOUSE_RENT = 50;
-	private static final int HOTEL_COST = 200;
-	private static final int HOTEL_RENT = 150;
 	
-	private ArrayList<Player> players = new ArrayList<Player>();
+	private Players players = new Players();
 	private Player currPlayer;
-	private UI ui = new UI(players);
-	private int numPlayers;//Number of players playing the game
 	private Dice dice = new Dice();
+	private Board board = new Board(dice);
+	private UI ui = new UI(players, board);
 	private boolean gameOver = false;
-	private Board board = new Board();
-	Property property;//array of owned property
-	Property DevelopedProperty;//array of property with houses on it
-	Property DevelopedProperty2;//array of property with hotels on it 
-	private int numHouses = 0;// Initalised number of houses on a property 
-	private int numHotels = 0;// Initalised number of houses on a property 
-	private String string; //searching properties by their name//
-	public String name;
+	private boolean onlyOneNotBankrupt = false;
+	private boolean turnFinished;
+	private boolean rollDone;
+	private boolean rentOwed;
+	private boolean rentPaid;
 	
 	Monopoly () {
-		numPlayers = 0;
 		ui.display();
 		return;
 	}
-	
+		
 	public void inputNames () {
+		int playerId = 0;
 		do {
-			ui.inputName(numPlayers);
+			ui.inputName(playerId);
 			if (!ui.isDone()) {
-				players.add(new Player(ui.getString(),ui.getTokenName(numPlayers)));
-				numPlayers++;
+				boolean duplicate = false;
+				for (Player p : players.get()) {
+					if (ui.getString().toLowerCase().equals(p.getName().toLowerCase())) {
+						duplicate = true;
+					}
+				}
+				if (!duplicate) {
+					players.add(new Player(ui.getString(),ui.getTokenName(playerId),playerId));
+					playerId++;
+				} else {
+					ui.displayError(UI.ERR_DUPLICATE);
+				}
 			}
-		} while (!ui.isDone() && numPlayers!=MAX_NUM_PLAYERS);
+		} while (!ui.isDone() && players.canAddPlayer());
 		return;
 	}
 	
-	
 	public void giveStartMoney () {
-		for (Player p : players) {
+		for (Player p : players.get()) {
 			p.doTransaction (START_MONEY);
 			ui.displayBankTransaction (p);
 		}
@@ -52,12 +54,11 @@ public class Monopoly {
 	}
 	
 	public void decideStarter () {
-		ArrayList<Player> inPlayers = new ArrayList<Player>(players), 
-				selectedPlayers = new ArrayList<Player>();
+		Players inPlayers = new Players(players), selectedPlayers = new Players();
 		boolean tie = false;
 		do {
 			int highestTotal = 0;
-			for (Player p : inPlayers) {
+			for (Player p : inPlayers.get()) {
 				dice.roll();
 				ui.displayDice(p,dice);
 				if (dice.getTotal() > highestTotal) {
@@ -72,7 +73,7 @@ public class Monopoly {
 			}
 			if (tie) {
 				ui.displayRollDraw();
-				inPlayers = new ArrayList<Player>(selectedPlayers);
+				inPlayers = new Players(selectedPlayers);
 				selectedPlayers.clear();
 			}
 		} while (tie);
@@ -81,116 +82,255 @@ public class Monopoly {
 		ui.display();
 		return;
 	}
+	
+	private void processRoll () {
+		if (!rollDone) {
+			if (!rentOwed) {
+				dice.roll();
+				ui.displayDice(currPlayer, dice);
+				currPlayer.move(dice.getTotal());
+				ui.display();
+				if (currPlayer.passedGo()) {
+					currPlayer.doTransaction(+GO_MONEY);
+					ui.displayPassedGo(currPlayer);
+					ui.displayBankTransaction(currPlayer);
+				}
+				ui.displaySquare(currPlayer, board, dice);
+				if (board.getSquare(currPlayer.getPosition()) instanceof Property && 
+						((Property) board.getSquare(currPlayer.getPosition())).isOwned() &&
+						!((Property) board.getSquare(currPlayer.getPosition())).getOwner().equals(currPlayer) ) {
+							rentOwed = true;
+							rentPaid = false;
+				} else {
+					rentOwed = false;
+				}
+				if (!dice.isDouble()) {
+					rollDone = true;
+				}
+			} else {
+				ui.displayError(UI.ERR_RENT_OWED);	
+			}
+		} else {
+			ui.displayError(UI.ERR_DOUBLE_ROLL);
+		}
+		return;
+	}
+	
+	private void processPayRent () {
+		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
+			Property property = (Property) board.getSquare(currPlayer.getPosition());
+			if (property.isOwned()) {
+				if (!property.getOwner().equals(currPlayer)) {
+					if (!rentPaid) {
+						int rent = property.getRent();
+						if (currPlayer.getBalance()>=rent) {
+							Player owner = property.getOwner();
+							currPlayer.doTransaction(-rent);
+							owner.doTransaction(+rent);
+							ui.displayTransaction(currPlayer, owner);
+							rentPaid = true;	
+							rentOwed = false;
+						} else {
+							ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);										
+						} 
+					} else {
+						ui.displayError(UI.ERR_RENT_ALREADY_PAID);									
+					}
+				} else {
+					ui.displayError(UI.ERR_SELF_OWNED);								
+				}
+			} else {
+				ui.displayError(UI.ERR_NOT_OWNED);							
+			}
+		} else {
+			ui.displayError(UI.ERR_NOT_A_PROPERTY);
+		}
+		return;
+	}
 
+	private void processBuy () {
+		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
+			Property property = (Property) board.getSquare(currPlayer.getPosition());
+			if (!property.isOwned()) {
+				if (currPlayer.getBalance() >= property.getPrice()) {				
+					currPlayer.doTransaction(-property.getPrice());
+					ui.displayBankTransaction(currPlayer);
+					currPlayer.addProperty(property);
+					ui.displayLatestProperty(currPlayer);
+				} else {
+					ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
+				}
+			} else {
+				ui.displayError(UI.ERR_IS_OWNED);
+			}
+		} else {
+			ui.displayError(UI.ERR_NOT_A_PROPERTY);
+		}
+		return;
+	}
+	
+	private void processBuild () {
+		Property property = ui.getInputProperty();
+		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
+			if (property instanceof Site) {
+				Site site = (Site) property;
+				if (currPlayer.isGroupOwner(site)) {
+					if (!site.isMortgaged()) {
+						int numBuildings = ui.getInputNumber();
+						if (numBuildings>0) {
+							if (site.canBuild(numBuildings)) {
+								int debit = numBuildings*site.getBuildingPrice();
+								if (currPlayer.getBalance()>debit) {
+									site.build(numBuildings);
+									currPlayer.doTransaction(-debit);
+									ui.displayBuild(currPlayer,site,numBuildings);
+								} else {
+									ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
+								}
+							} else {
+								ui.displayError(UI.ERR_TOO_MANY_BUILDINGS);
+							}
+						} else {
+							ui.displayError(UI.ERR_TOO_FEW_BUILDINGS);
+						}
+					} else {
+						ui.displayError(UI.SITE_IS_MORTGAGED);
+					}
+				} else {
+					ui.displayError(UI.ERR_DOES_NOT_HAVE_GROUP);
+				}
+			} else {
+				ui.displayError(UI.ERR_NOT_A_SITE);
+			}
+		} else {
+			ui.displayError(UI.ERR_NOT_YOURS);
+		}
+		return;
+	}
+	
+	private void processDemolish () {
+		Property property = ui.getInputProperty();
+		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
+			if (property instanceof Site) {
+				Site site = (Site) property;
+				int numBuildings = ui.getInputNumber();
+				if (numBuildings>0) {
+					if (site.canDemolish(numBuildings)) {
+						site.demolish(numBuildings);
+						int credit = numBuildings * site.getBuildingPrice()/2;
+						currPlayer.doTransaction(+credit);
+						ui.displayDemolish(currPlayer,site,numBuildings);
+					} else {
+						ui.displayError(UI.ERR_TOO_MANY_BUILDINGS);
+					}
+				} else {
+					ui.displayError(UI.ERR_TOO_FEW_BUILDINGS);
+				}
+			} else {
+				ui.displayError(UI.ERR_NOT_A_SITE);
+			}
+		} else {
+			ui.displayError(UI.ERR_NOT_YOURS);
+		}
+		return;		
+	}
+	
+	
+	public void processBankrupt () {
+		ui.displayBankrupt(currPlayer);
+		Player tempPlayer = players.getNextPlayer(currPlayer);
+		players.remove(currPlayer);
+		currPlayer = tempPlayer;
+		if (players.numPlayers()==1) {
+			gameOver = true;
+			onlyOneNotBankrupt = true;
+		}
+		ui.display();
+		return;
+	}
+	
+	public void takeTax(){
+		
+		if (board.getSquare(currPlayer.getPosition()) instanceof Tax){
+			
+		}
+		currPlayer.doTransaction(-200);
+		ui.displayBankTransaction(currPlayer);
+			
+	
+		return;
+	}
+		
+	public void processMortgage () {
+		Property property = ui.getInputProperty();
+		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
+			if ((property instanceof Site) && !((Site) property).hasBuildings() || (property instanceof Station) || (property instanceof Utility)) {
+				if (!property.isMortgaged()) {
+					property.setMortgaged();
+					currPlayer.doTransaction(+property.getMortgageValue());
+					ui.displayMortgage(currPlayer,property);
+				} else {
+					ui.displayError(UI.ERR_IS_MORTGAGED);
+				}
+			} else {
+				ui.displayError(UI.ERR_HAS_BUILDINGS);
+			}
+		} else {
+			ui.displayError(UI.ERR_NOT_YOURS);
+		}
+		return;		
+	}
+	
+	public void processRedeem () {
+		Property property = ui.getInputProperty();
+		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
+			if (property.isMortgaged()) {
+				int price = property.getMortgageRemptionPrice();
+				if (currPlayer.getBalance() >= price) {
+					property.setNotMortgaged();
+					currPlayer.doTransaction(-price);
+					ui.displayMortgageRedemption(currPlayer,property);
+				} else {
+					ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
+				}
+			} else {
+				ui.displayError(UI.ERR_IS_NOT_MORTGAGED);
+			}
+		} else {
+			ui.displayError(UI.ERR_NOT_YOURS);
+		}
+		return;			
+	}
+
+	private void processDone () {
+		if (rollDone) {
+			if (!rentOwed || (rentOwed && rentPaid)) {
+				turnFinished = true;
+			} else {
+				ui.displayError(UI.ERR_RENT_OWED);
+			}
+		} else {
+			ui.displayError(UI.ERR_NO_ROLL);
+		}
+		return;
+	}
+	
 	public void processTurn () {
-		boolean turnFinished = false;
-		boolean rollDone = false;
-		boolean rentOwed = false;
-		boolean rentPaid = false;
+		turnFinished = false;
+		rollDone = false;
+		rentOwed = false;
+		rentPaid = false;
 		do {
 			ui.inputCommand(currPlayer);
 			switch (ui.getCommandId()) {
 				case UI.CMD_ROLL :
-					if (!rollDone) {
-						if (!rentOwed) {
-							dice.roll();
-							ui.displayDice(currPlayer, dice);
-							currPlayer.move(dice.getTotal());
-							ui.display();
-							if (currPlayer.passedGo()) {
-								currPlayer.doTransaction(+GO_MONEY);
-								ui.displayPassedGo(currPlayer);
-								ui.displayBankTransaction(currPlayer);
-							}
-							ui.displaySquare(currPlayer, board);
-							if (board.isProperty(currPlayer.getPosition()) && 
-									board.getProperty(currPlayer.getPosition()).isOwned() &&
-									!board.getProperty(currPlayer.getPosition()).getOwner().equals(currPlayer) ) {
-										rentOwed = true;
-							} else {
-								rentOwed = false;
-							}
-							if (!dice.isDouble()) {
-								rollDone = true;
-							}
-						} else {
-							ui.displayError(UI.ERR_RENT_OWED);	
-						}
-					} else {
-						ui.displayError(UI.ERR_DOUBLE_ROLL);
-					}
+					processRoll();
 					break;
 				case UI.CMD_PAY_RENT :
-					if (board.isProperty(currPlayer.getPosition())) {//Checks if the location is actually a property
-						Property property = board.getProperty(currPlayer.getPosition());
-						if (property.isOwned()) {//checks if it is owned
-							if (!property.getOwner().equals(currPlayer)) {//checks to make sure that the owner is the not  the current player
-								if (!rentPaid) {//makes sure the rent is not paid
-									if(board.isProperty(currPlayer.getPosition())){
-										Property DevelopedProperty = board.getProperty(currPlayer.getPosition());
-								        if (currPlayer.getBalance()>=DevelopedProperty.getRent()+((HOUSE_RENT)*(numHouses))){//makes sure that the player has enough money to pay rent
-										    Player owner1 = DevelopedProperty.getOwner();
-										    currPlayer.doTransaction(-DevelopedProperty.getRent()+((HOUSE_RENT)*(numHouses)));//takes the correct rent out of the current players balance
-										    owner1.doTransaction(+DevelopedProperty.getRent()+((HOUSE_RENT)*(numHouses)));// adds it to the owners
-										    ui.displayTransaction(currPlayer, owner1);
-										    rentPaid = true;	
-										    rentOwed = false;
-								            } 
-								        else if (currPlayer.getBalance()>=DevelopedProperty2.getRent()+((HOTEL_RENT)*(numHotels))){// same but for hotels instead of houses
-										    Player owner1 = DevelopedProperty2.getOwner();
-										    currPlayer.doTransaction(-DevelopedProperty2.getRent()+((HOTEL_RENT)*(numHotels)));
-										    owner1.doTransaction(+DevelopedProperty2.getRent()+((HOTEL_RENT)*(numHotels)));
-										    ui.displayTransaction(currPlayer, owner1);
-										    rentPaid = true;	
-										    rentOwed = false;
-								            } 
-								        else if (currPlayer.getBalance()>=property.getRent()) {// rent just for property with no buildings
-										     Player owner2 = property.getOwner();
-										     currPlayer.doTransaction(-property.getRent());
-										     owner2.doTransaction(+property.getRent());
-										     ui.displayTransaction(currPlayer, owner2);
-										     rentPaid = true;	
-										     rentOwed = false;
-								             } 
-									      else {
-									 ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);	
-									 ui.displayError(UI.ERR_BANKRUPT);
-								      }
-									}
-									else{
-								    	  ui.displayError(UI.ERR_RENT_ALREADY_PAID);//Correct Error messages
-									}
-								} else {
-									ui.displayError(UI.ERR_RENT_ALREADY_PAID);									
-								}
-							} else {
-								ui.displayError(UI.ERR_SELF_OWNED);								
-							}
-						} else {
-							ui.displayError(UI.ERR_NOT_OWNED);							
-						}
-					} else {
-						ui.displayError(UI.ERR_NOT_A_PROPERTY);
-					}
+					processPayRent();
 					break;
 				case UI.CMD_BUY :
-					if (board.isProperty(currPlayer.getPosition())) {
-						Property property = board.getProperty(currPlayer.getPosition());
-						if (!property.isOwned()) {
-							if (currPlayer.getBalance() >= property.getValue()) {				
-								currPlayer.doTransaction(-property.getValue());
-								ui.displayBankTransaction(currPlayer);
-								currPlayer.boughtProperty(property);
-								ui.displayLatestProperty(currPlayer);
-							} else {
-								ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
-							}
-						} else {
-							ui.displayError(UI.ERR_IS_OWNED);
-						}
-					} else {
-						ui.displayError(UI.ERR_NOT_A_PROPERTY);
-					}
+					processBuy();
 					break;
 				case UI.CMD_BALANCE :
 					ui.displayBalance(currPlayer);
@@ -198,229 +338,63 @@ public class Monopoly {
 				case UI.CMD_PROPERTY :
 					ui.displayProperty(currPlayer);
 					break;
+				case UI.CMD_BANKRUPT :
+					processBankrupt();
+					turnFinished = true;
+					break;
+				case UI.CMD_BUILD :
+					processBuild();
+					break;
+				case UI.CMD_DEMOLISH :
+					processDemolish();
+					break;
+				case UI.CMD_REDEEM :
+					processRedeem();
+					break;
+				case UI.CMD_MORTGAGE :
+					processMortgage();
+					break;
 				case UI.CMD_HELP :
 					ui.displayCommandHelp();
 					break;
 				case UI.CMD_DONE :
-					if (rollDone) {
-						if (!rentOwed || (rentOwed && rentPaid)) {
-							turnFinished = true;
-						} else {
-							ui.displayError(UI.ERR_RENT_OWED);
-						}
-					} else {
-						ui.displayError(UI.ERR_NO_ROLL);
-					}
+					processDone();
 					break;
-				case UI.CMD_BANKRUPT : 
-					ui.displayReturnedProperties(currPlayer); //Displays all the properties which will be returned to the bank
-					currPlayer.clearProperties(); //Returns the properties to the bank
-					currPlayer.clearHouses();//Clears any Buildings belonging to the bankrupt player
-					currPlayer.clearHotels();//Clears any Buildings belonging to the bankrupt player
-					players.remove(currPlayer); //Removes the current player from the game
-					numPlayers -= 1;
-					 if(numPlayers==1){   //checks to see if the game is over
-						 gameOver = true;}
-					turnFinished = true; //finishes the current players turn
-					break;	
-				case UI.CMD_BUILD_HOUSE : 
-				if (board.isProperty(currPlayer.getPosition())) { //checks if its a property
-						Property DevelopedProperty = board.getProperty(currPlayer.getPosition());
-				   if (DevelopedProperty.isOwned()) { //checks if owned
-						if (DevelopedProperty.getOwner().equals(currPlayer)) { //checks if current player owns property
-						  if(numHouses < 4){ //no more than 4 houses
-							if (currPlayer.getBalance() >= HOUSE_COST) {				
-								currPlayer.doTransaction(-HOUSE_COST); //minuses cost of house from balance
-								ui.displayBankTransaction(currPlayer);
-								currPlayer.buildHouse(DevelopedProperty);
-								numHouses += 1; //increments no.of houses by one
-								ui.displayString(currPlayer+" built a house on "+ DevelopedProperty);
-							} else { //correct error reports
-								ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
-							}
-						  } else {
-								ui.displayError(UI.ERR_HOUSES);
-							}
-						} else {
-							ui.displayError(UI.ERR_BUILD);
-						}
-						}
-						else {
-							ui.displayError(UI.ERR_BUILD);
-						}
-					} else {
-						ui.displayError(UI.ERR_NOT_A_PROPERTY);
-					}
-					break;
-					
-				case UI.CMD_BUILD_HOTEL : 
-					if (board.isProperty(currPlayer.getPosition())) { //checks if its a property
-						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
-				   if (DevelopedProperty2.isOwned()) { //checks if owned
-						if (DevelopedProperty2.getOwner().equals(currPlayer)) { //checks if current player owns property
-						  if(numHouses == 4){ //no more than 4 houses
-							  if(numHotels == 1){
-							if (currPlayer.getBalance() >= HOTEL_COST) {				
-								currPlayer.doTransaction(-HOTEL_COST); //minuses cost of house from balance
-								ui.displayBankTransaction(currPlayer);
-								currPlayer.buildHotel(DevelopedProperty2);
-								numHotels += 1; //increments no.of houses by one
-								ui.displayString(currPlayer+" built a hotel on "+ DevelopedProperty2);
-							} else { //correct error reports
-								ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
-							}
-							   } else {
-									ui.displayError(UI.ERR_HOTELS);
-								}
-						  } else {
-								ui.displayError(UI.ERR_BUILD_HOTEL);
-							}
-						} else {
-							ui.displayError(UI.ERR_BUILD);
-						}
-						}
-						else {
-							ui.displayError(UI.ERR_BUILD);
-						}
-					} else {
-						ui.displayError(UI.ERR_NOT_A_PROPERTY);
-					}
-						break;
-				
-				case UI.CMD_DEMOLISH_HOUSE : //Demolish House
-					if (board.isProperty(currPlayer.getPosition())) {
-						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
-				   if (DevelopedProperty2.isOwned()) {
-						if (DevelopedProperty2.getOwner().equals(currPlayer)) {//makes sure that the property is owned by the player in question
-						  if(numHouses >= 1){//makes sure that theres at least one house to demolish
-								numHouses -= 1;//deducts the amount of houses by 1
-								currPlayer.doTransaction(+(HOUSE_COST/2));//refunds half of the value for the house to the player
-								ui.displayString(currPlayer+" demolished a house on "+ DevelopedProperty2);
-								ui.displayBankTransaction(currPlayer);// User interface display
-							 } else {
-									ui.displayError(UI.ERR_DEMOLISH);//Correct error messages
-								}
-						  
-						  } else {
-								ui.displayError(UI.ERR_DEMOLISH2);
-							}
-						}
-						else {
-							ui.displayError(UI.ERR_DEMOLISH2);
-						}
-					} else {
-						ui.displayError(UI.ERR_NOT_A_PROPERTY);
-					}
-					break;
-					
-                case UI.CMD_DEMOLISH_HOTEL : //Exact same but for hotel instead of house
-                	if (board.isProperty(currPlayer.getPosition())) {
-						Property DevelopedProperty2 = board.getProperty(currPlayer.getPosition());
-				   if (DevelopedProperty2.isOwned()) {
-						if (DevelopedProperty2.getOwner().equals(currPlayer)) {
-						  if(numHouses >= 1){
-								numHotels -= 1;
-								currPlayer.doTransaction(+(HOTEL_COST/2));
-								ui.displayString(currPlayer+" demolished a hotel on "+DevelopedProperty2);
-								ui.displayBankTransaction(currPlayer);
-							 } else {
-									ui.displayError(UI.ERR_DEMOLISH);//Correct error messages
-								}
-						  
-						  } else {
-								ui.displayError(UI.ERR_DEMOLISH2);
-							}
-						}
-						else {
-							ui.displayError(UI.ERR_DEMOLISH2);
-						}
-					} else {
-						ui.displayError(UI.ERR_NOT_A_PROPERTY);
-					}
-					break;
-					
-                case UI.CMD_MORTGAGE :
-                	if (board.isProperty(currPlayer.getPosition())) { //gets players current position
-                		Property MortgagedProperty = board.getProperty(currPlayer.getPosition());
-						if (MortgagedProperty.isOwned()) //checks if owned
-						{			
-								currPlayer.doTransaction((+MortgagedProperty.getValue())/2); //adds 50% of the value of the property to current player balance
-								ui.displayBankTransaction(currPlayer); //displays bank balance
-								ui.displayMortgagedProperties(currPlayer);
-								currPlayer.mortgagedProperty(MortgagedProperty); //adds it to morgaged property list	
-						} else { //correct error messages
-							ui.displayError(UI.ERR_NOT_OWNED);
-						}
-                	}
-                	else 
-                	{
-						ui.displayError(UI.ERR_NOT_A_PROPERTY);
-					} 
-					break;	
-						
-                case UI.CMD_REDEEM : 
-                	if (board.isProperty(currPlayer.getPosition())){ //gets players current position
-                		Property RedeemedProperty = board.getProperty(currPlayer.getPosition());{
-                			if (RedeemedProperty.isOwned()) //checks if owned
-                			{
-                				currPlayer.doTransaction((-RedeemedProperty.getValue())/2); //adds 50% of the value of the property to current player balance
-                				ui.displayBankTransaction(currPlayer); //displays bank balance
-                				currPlayer.redeemedProperty(RedeemedProperty); //adds back to owned property list
-                				
-                			}
-                			else { //correct error messages
-    							ui.displayError(UI.ERR_NOT_OWNED);
-    						}
-                		}
-                	}
-					break;
-					
 				case UI.CMD_QUIT : 
 					turnFinished = true;
 					gameOver = true;
-					break;
-				case UI.CMD_ENQUIRE : 
-					ui.infoPanel.displayString(currPlayer + "Enter street name here:");
-					ui.commandPanel.inputString();
-					string = ui.commandPanel.getString();
-					ui.infoPanel.displayString("> " + string);
-					string = ui.commandPanel.getString();
-					
-					for(int s = 0; s < 40; s++){/*
-						if(Board.squares[s].name.equals(string)){
-							ui.infoPanel.displayString("> " + true);}
-						else{
-						      ui.infoPanel.displayString("> " + false);
-						return;}
-						turnFinished=false;
-						*/}
 					break;
 			}
 		} while (!turnFinished);
 		return;
 	}
 	
+	
 	public void nextPlayer () {
-			currPlayer = players.get((players.indexOf(currPlayer) + 1) % players.size());
+		currPlayer = players.getNextPlayer(currPlayer);
 		return;
 	}
 	
 	public void decideWinner () {
-		ArrayList<Player> playersWithMostAssets = new ArrayList<Player>();
-		int mostAssets = players.get(0).getAssets();
-		for (Player player : players) {
-			ui.displayAssets(player);
-			if (player.getAssets() > mostAssets) {
-				playersWithMostAssets.clear(); 
-				playersWithMostAssets.add(player);
-			} else if (player.getAssets() == mostAssets) {
-				playersWithMostAssets.add(player);
-			}
-		}
-		if (playersWithMostAssets.size() == 1) {
-			ui.displayWinner(playersWithMostAssets.get(0));
+		if (onlyOneNotBankrupt) {
+			ui.displayWinner(currPlayer);			
 		} else {
-			ui.displayDraw(playersWithMostAssets);
+			ArrayList<Player> playersWithMostAssets = new ArrayList<Player>();
+			int mostAssets = players.get(0).getAssets();
+			for (Player player : players.get()) {
+				ui.displayAssets(player);
+				if (player.getAssets() > mostAssets) {
+					playersWithMostAssets.clear(); 
+					playersWithMostAssets.add(player);
+				} else if (player.getAssets() == mostAssets) {
+					playersWithMostAssets.add(player);
+				}
+			}
+			if (playersWithMostAssets.size() == 1) {
+				ui.displayWinner(playersWithMostAssets.get(0));
+			} else {
+				ui.displayDraw(playersWithMostAssets);
+			}
 		}
 		return;
 	}
@@ -430,9 +404,7 @@ public class Monopoly {
 		return;
 	}
 	
-	
 	public boolean isGameOver () {
 		return gameOver;
 	}
-
 }

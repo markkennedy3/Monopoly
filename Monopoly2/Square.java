@@ -1,11 +1,9 @@
 
 public class Square {
 
-	String name;
-	String colour;
+	private String name;
 	
-	Square (String name, String colour) {
-		this.colour = colour;
+	Square (String name) {
 		this.name = name;
 		return;
 	}
@@ -17,4 +15,5 @@ public class Square {
 	public String toString () {
 		return name;
 	}
+	
 }
