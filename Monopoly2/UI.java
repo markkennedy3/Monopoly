@@ -8,7 +8,7 @@ public class UI {
 
 	private static final int FRAME_WIDTH = 1200;
 	private static final int FRAME_HEIGHT = 800;
-	private static final String CURRENCY = " Euros";
+	private static final String CURRENCY = " pounds";
 	
 	public static final int CMD_QUIT = 0;
 	public static final int CMD_DONE = 1;
@@ -25,7 +25,8 @@ public class UI {
 	public static final int CMD_BUILD = 12;
 	public static final int CMD_SELL = 14;
 	public static final int CMD_REDEEM = 15;
-	public static final int CMD_DEMOLISH = 16;
+	public static final int CMD_CHEAT = 16;
+	public static final int CMD_DEMOLISH = 17;
 	
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
@@ -48,6 +49,7 @@ public class UI {
 	public static final int ERR_IS_MORTGAGED = 18;
 	public static final int ERR_IS_NOT_MORTGAGED = 19;
 	public static final int SITE_IS_MORTGAGED = 20;
+	public static final int ERR_IN_JAIL = 21;
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
@@ -70,7 +72,8 @@ public class UI {
 		"Error: The site has units on it.",
 		"Error: The property has already been mortgaged.",
 		"Error: The property has not been mortgaged.",
-		"Error: The property has been mortgaged."
+		"Error: The property has been mortgaged.",
+		"Error: You are in jail you cannot do this command"
 	};
 	
 	private JFrame frame = new JFrame();
@@ -91,7 +94,7 @@ public class UI {
 		this.board = board;
 		boardPanel = new BoardPanel(this.players);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-		frame.setTitle("MrPennybag's Monopoly");
+		frame.setTitle("Monopoly");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(boardPanel, BorderLayout.LINE_START);
 		frame.add(infoPanel, BorderLayout.LINE_END);
@@ -158,6 +161,7 @@ public class UI {
 			string = string.trim();
 			string = string.replaceAll("( )+", " ");
 			String[] words = string.split(" ");
+			
 			switch (words[0]) {
 				case "quit" :
 					commandId = CMD_QUIT;
@@ -194,6 +198,7 @@ public class UI {
 				case "bankrupt" :
 					commandId = CMD_BANKRUPT;
 					inputValid = hasNoArgument(words);
+					
 					break;
 				case "mortgage" :
 					commandId = CMD_MORTGAGE;
@@ -235,9 +240,17 @@ public class UI {
 					break;					
 				case "help" :
 					commandId = CMD_HELP;
-					inputValid = hasNoArgument(words);
+					inputValid = hasOneArgument(words);
 					break;
-				
+				case "cheat" :
+					commandId = CMD_CHEAT;
+					if (hasOneArgument(words) && words[1].matches("[0-9]+")) {
+						inputNumber = Integer.parseInt(words[1]);
+						inputValid = true;
+					} else {
+						inputValid = false;
+					}
+					break;
 				default:
 					inputValid = false;
 				}

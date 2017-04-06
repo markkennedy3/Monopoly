@@ -1,14 +1,4 @@
-public class Tax extends Square
-{
-	String name;
-	int price;
 
-	
+public class Tax {
 
-Tax (String name,int price) {
-	super(name);
-	this.price = price;
-		
-		return;
-	}
 }

@@ -4,11 +4,16 @@ public class Property extends Square {
 	private static final float MORTGAGE_PREMIUM = 1.1f;
 	
 	private boolean isOwned;
-	public int price;
+	private int price;
 	private Player owner;
 	private String shortName;
 	private boolean mortgaged;
 	private int mortgageValue;
+	boolean isGoToJail;
+	boolean isJail;
+	int jailMoney;
+	int jailFine;
+	boolean isFinePaid;
 	
 	Property (String name, int price, String shortName, int mortgageValue) {
 		super(name);
@@ -18,6 +23,11 @@ public class Property extends Square {
 		owner = null;
 		mortgaged = false;
 		this.mortgageValue = mortgageValue;
+		isGoToJail = false;
+		isJail = false;
+		jailMoney = 50;
+		jailFine = 50;
+		isFinePaid = false;
 		return;
 	}
 		
@@ -80,6 +90,25 @@ public class Property extends Square {
 		return (int) (((float) mortgageValue) * MORTGAGE_PREMIUM);
 	}
 	
+	//Methods for sprint 4 dealing with Jail
+	public boolean isGoToJail(){
+		return isGoToJail;
+	}
+	public boolean isJail(){
+		return isJail;
+	}
+	
+	public boolean isFinePaid() {
+		return isFinePaid;
+	}
+	
+	public int getJailFine (){
+		return jailFine;
+	}
+	
+	/*public int bailFromJail() {
+		
+	}*/
 // COMMON JAVA METHODS	
 	
 	public boolean equals (String string) {

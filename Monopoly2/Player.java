@@ -9,7 +9,8 @@ public class Player {
 	private String tokenName;
 	private int tokenId;
 	private boolean passedGo;
-	private boolean takeTax;
+	boolean inJail;
+	int posFromJail;
 	private ArrayList<Property> properties = new ArrayList<Property>();
 	
 // CONSTRUCTORS
@@ -21,7 +22,8 @@ public class Player {
 		position = 0;
 		balance = 0;
 		passedGo = false;
-		takeTax = false;
+		inJail = false;
+		posFromJail = 0;
 		return;
 	}
 	
@@ -62,10 +64,28 @@ public class Player {
 		} 
 		return;
 	}
-
+	//Jail Methods
+	public int getPositionsFromJail (){
+		if(position >= 10){
+			posFromJail = (Board.NUM_SQUARES - position) + 10;
+		}
+		else if(position < 10){
+			posFromJail = 10 - position;
+		}
 		
-	
-	
+		return posFromJail;
+	}
+	public void moveToJail (int posFromJail){
+		position = position + posFromJail;
+		if (position >= Board.NUM_SQUARES) {
+			position = position - Board.NUM_SQUARES;
+			passedGo = false;
+		}
+		else if(position < 0){
+			position = position + Board.NUM_SQUARES;
+			passedGo = false;
+		} 
+	}
 	public boolean passedGo () {
 		return passedGo;
 	}
@@ -119,7 +139,9 @@ public class Player {
 		}
 		return ownsAll;
 	}
-	
+	public boolean isInJail(){
+		return inJail;
+	}
 	public int getNumStationsOwned () {
 		int numOwned = 0;
 		for (Property p : properties) {
@@ -139,6 +161,7 @@ public class Player {
 		}
 		return numOwned;
 	}
+	
 	
 // COMMON JAVA METHODS	
 	
