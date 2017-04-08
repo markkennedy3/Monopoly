@@ -11,8 +11,10 @@ public class Property extends Square {
 	private int mortgageValue;
 	boolean isGoToJail;
 	boolean isJail;
+	boolean onTax;
 	int jailMoney;
 	int jailFine;
+	int taxFine;
 	boolean isFinePaid;
 	
 	Property (String name, int price, String shortName, int mortgageValue) {
@@ -25,6 +27,8 @@ public class Property extends Square {
 		this.mortgageValue = mortgageValue;
 		isGoToJail = false;
 		isJail = false;
+		onTax = false;
+		taxFine = 200;
 		jailMoney = 50;
 		jailFine = 50;
 		isFinePaid = false;
@@ -106,10 +110,19 @@ public class Property extends Square {
 		return jailFine;
 	}
 	
-	/*public int bailFromJail() {
-		
-	}*/
-// COMMON JAVA METHODS	
+	/*public int bailFromJail() {}*/
+
+/*Michael
+	
+	public boolean onTax(){
+		return onTax;
+	}
+	
+	public int getTaxFine (){
+		return taxFine;
+	}
+*/
+// COMMON JAVA METHODS//	
 	
 	public boolean equals (String string) {
 		return shortName.equals(string);

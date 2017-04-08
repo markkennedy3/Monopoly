@@ -8,7 +8,7 @@ public class UI {
 
 	private static final int FRAME_WIDTH = 1200;
 	private static final int FRAME_HEIGHT = 800;
-	private static final String CURRENCY = " pounds";
+	private static final String CURRENCY = " Euros";
 	
 	public static final int CMD_QUIT = 0;
 	public static final int CMD_DONE = 1;
@@ -94,7 +94,7 @@ public class UI {
 		this.board = board;
 		boardPanel = new BoardPanel(this.players);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-		frame.setTitle("Monopoly");
+		frame.setTitle("Mr Pennybags Monopoly");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(boardPanel, BorderLayout.LINE_START);
 		frame.add(infoPanel, BorderLayout.LINE_END);
@@ -240,7 +240,7 @@ public class UI {
 					break;					
 				case "help" :
 					commandId = CMD_HELP;
-					inputValid = hasOneArgument(words);
+					inputValid = hasNoArgument(words);
 					break;
 				case "cheat" :
 					commandId = CMD_CHEAT;
@@ -457,6 +457,21 @@ public class UI {
 	
 	public void displayDraw (ArrayList<Player> players) {
 		infoPanel.displayString("The following players drew the game " + players);
+		return;
+	}
+	
+	public void displayMovedToGo (Player player) {
+		infoPanel.displayString(player + " has been moved to Go.");
+		return;
+	}
+	
+	public void displayMovedToBikeShop (Player player) {
+		infoPanel.displayString(player + " has been moved to Bike Shop.");
+		return;
+	}
+	
+	public void displayLandedOnCommunityChest (Player player) {
+		infoPanel.displayString(player + " landed on Community Chest!.");
 		return;
 	}
 }

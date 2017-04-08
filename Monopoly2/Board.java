@@ -113,8 +113,8 @@ public class Board {
 		//New methods for sprint 4
 		/*public boolean isTax (String shortName){
 			return isTax(shortName) && getProperty(shortName) instanceof Tax;
-		}*/
-		/*public boolean isJail (String shortName) {
+		}
+		public boolean isJail (String shortName) {
 			return isProperty(shortName) && getProperty(shortName) instanceof Jail;
 		}*/
 }

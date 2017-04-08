@@ -5,9 +5,10 @@ public class Monopoly {
 
 	private static final int START_MONEY = 1500;
 	private static final int GO_MONEY = 200;
+	private static final int TAX_MONEY = 200;
 	
 	private Players players = new Players();
-	private Player currPlayer;
+	public Player currPlayer;
 	private Dice dice = new Dice();
 	private Board board = new Board(dice);
 	private UI ui = new UI(players, board);
@@ -91,12 +92,35 @@ public class Monopoly {
 				ui.displayDice(currPlayer, dice);
 				currPlayer.move(dice.getTotal());
 				ui.display();
+				
 				if (currPlayer.passedGo()) {
 					currPlayer.doTransaction(+GO_MONEY);
 					ui.displayPassedGo(currPlayer);
 					ui.displayBankTransaction(currPlayer);
 				}
 				ui.displaySquare(currPlayer, board, dice);
+				
+				//takes 200 from balance when square is landed on
+				
+				if(board.getSquare(currPlayer.getPosition()) instanceof Property){
+					if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){
+						currPlayer.doTransaction(-TAX_MONEY);
+						ui.displayBankTransaction(currPlayer);
+					}
+				}
+				
+				
+				
+				if(board.getSquare(currPlayer.getPosition()) instanceof Property){
+					if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 34){
+						Cards.CommunityChest();
+						ui.displayLandedOnCommunityChest(currPlayer);
+					}
+					ui.displaySquare(currPlayer, board, dice);
+				}
+				
+				
+				
 				if (board.getSquare(currPlayer.getPosition()) instanceof Property && 
 						((Property) board.getSquare(currPlayer.getPosition())).isOwned() &&
 						!((Property) board.getSquare(currPlayer.getPosition())).getOwner().equals(currPlayer) ) {
@@ -130,6 +154,7 @@ public class Monopoly {
 				rollDone = true;
 			}
 		}
+		
 		return;
 	}
 	
@@ -205,6 +230,27 @@ public class Monopoly {
 		
 	}
 	
+	
+	/*
+	private void PayTax(){
+		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
+			Property property = (Property) board.getSquare(currPlayer.getPosition());
+			if (property.onTax() == true) {
+						int taxfine = property.getTaxFine();
+						Player tax = null;
+						if (currPlayer.getBalance()>= taxfine) {
+							currPlayer.doTransaction(-taxfine);
+							ui.displayTransaction(currPlayer, tax);
+						
+						
+				}
+				
+			}
+			
+		}
+		
+	}
+	*/
 	private void processBuild () {
 		Property property = ui.getInputProperty();
 		if (property.isOwned() && property.getOwner().equals(currPlayer)) {

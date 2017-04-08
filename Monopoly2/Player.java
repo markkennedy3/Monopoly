@@ -86,6 +86,19 @@ public class Player {
 			passedGo = false;
 		} 
 	}
+	
+	//Michael//
+	
+	public int moveToGo (){
+		position = 1;
+		return position;
+	}
+	
+	public int moveToBikeShop (){
+		position = 2;
+		return position;
+	}
+	
 	public boolean passedGo () {
 		return passedGo;
 	}
