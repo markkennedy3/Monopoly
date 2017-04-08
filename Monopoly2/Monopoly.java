@@ -123,21 +123,32 @@ public class Monopoly {
 		//takes 200 from balance when square is landed on
 		
 		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
-			if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){
+			if(currPlayer.getPosition() == 0 || currPlayer.getPosition() == 38){
 				currPlayer.doTransaction(-TAX_MONEY);
 				ui.displayBankTransaction(currPlayer);
+				ui.displaySquare(currPlayer, board, dice);
 			}
 		}
-		ui.displaySquare(currPlayer, board, dice);
+		
 		
 		
 		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
-			if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 34){
+			if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){
 				Cards.CommunityChest();
 				ui.displayLandedOnCommunityChest(currPlayer);
+				ui.displaySquare(currPlayer, board, dice);
 			}
 		}
-		ui.displaySquare(currPlayer, board, dice);
+		
+		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
+			if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){
+				Cards.Chance();
+				ui.displayLandedOnChance(currPlayer);
+				ui.displaySquare(currPlayer, board, dice);
+			}
+		}
+		
+		
 		
 		if(numOfDoubles == 3){//If there are 3 doubles in a row
 			
@@ -146,6 +157,8 @@ public class Monopoly {
 			currPlayer.inJail = true;
 			rollDone = true;
 		}
+		
+		
 		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
 			if(currPlayer.getPosition() == 30){
 				int positionFromJail = currPlayer.getPositionsFromJail();

@@ -186,5 +186,9 @@ public class Player {
 		return name + " (" + tokenName + ")";
 	}
 	
+	public void CommunityChest()
+	{
+	}
+	
 
 }

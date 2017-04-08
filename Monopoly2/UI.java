@@ -463,4 +463,9 @@ public class UI {
 		infoPanel.displayString(player + " landed on Community Chest!.");
 		return;
 	}
+	
+	public void displayLandedOnChance (Player player) {
+		infoPanel.displayString(player + " landed on Chance!.");
+		return;
+	}
 }

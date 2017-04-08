@@ -121,7 +121,7 @@ public static void CommunityChest()
     default :
         System.out.println("Invalid output");
   }
-  
+  return;
 }
 
 
