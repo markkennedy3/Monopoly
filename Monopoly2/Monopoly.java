@@ -157,7 +157,7 @@ public class Monopoly {
 		
 		return;
 	}
-	
+
 	private void processPayRent () {
 		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
 			Property property = (Property) board.getSquare(currPlayer.getPosition());
@@ -210,6 +210,7 @@ public class Monopoly {
 		}
 		return;
 	}
+	
 	private void PayFromJail(){
 		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
 			Property property = (Property) board.getSquare(currPlayer.getPosition());
@@ -251,6 +252,7 @@ public class Monopoly {
 		
 	}
 	*/
+	
 	private void processBuild () {
 		Property property = ui.getInputProperty();
 		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
@@ -317,20 +319,6 @@ public class Monopoly {
 		return;		
 	}
 	
-	public void processCheat () {
-		switch (ui.getInputNumber()) {
-			case 1 :       // acquire colour group
-				Property property = board.getProperty("kent");
-				currPlayer.addProperty(property);		
-				property = board.getProperty("whitechapel");
-				currPlayer.addProperty(property);
-				break;
-			case 2 :	   // make zero balance
-				currPlayer.doTransaction(-currPlayer.getBalance());
-				break;
-		}
-		return;
-	}
 	
 	public void processBankrupt () {
 		ui.displayBankrupt(currPlayer);
@@ -345,6 +333,8 @@ public class Monopoly {
 		return;
 	}
 	
+
+		
 	public void processMortgage () {
 		Property property = ui.getInputProperty();
 		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
@@ -470,13 +460,6 @@ public class Monopoly {
 					processMortgage();
 					break;
 					}
-				case UI.CMD_CHEAT :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
-					processCheat();
-					break;
-					}
 				case UI.CMD_HELP :
 					ui.displayCommandHelp();
 					break;
@@ -498,6 +481,8 @@ public class Monopoly {
 		} while (!turnFinished);
 		return;
 	}
+	
+	
 	
 	public void nextPlayer () {
 		currPlayer = players.getNextPlayer(currPlayer);
