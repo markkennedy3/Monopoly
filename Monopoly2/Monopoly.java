@@ -5,7 +5,6 @@ public class Monopoly {
 
 	private static final int START_MONEY = 1500;
 	private static final int GO_MONEY = 200;
-	private static final int TAX_MONEY = 200;
 	
 	private Players players = new Players();
 	public Player currPlayer;
@@ -120,29 +119,28 @@ public class Monopoly {
 			numOfDoubles += 1;
 		}
 		
-		//takes 200 from balance when square is landed on
-		
-		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
+	
 			if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){
 				processPayTax();
 			}
-		}
+	
 		
-			if(board.getSquare(currPlayer.getPosition()) instanceof Property){
+		
 			if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){
 				Cards.CommunityChest();
 				ui.displayLandedOnCommunityChest(currPlayer);
 				ui.displaySquare(currPlayer, board, dice);
 			}
-		}
 		
-		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
+		
+	
 			if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){
 				Cards.Chance();
 				ui.displayLandedOnChance(currPlayer);
 				ui.displaySquare(currPlayer, board, dice);
+				turnFinished = false;
 			}
-		}
+		
 		
 		
 		if(numOfDoubles == 3){//If there are 3 doubles in a row
@@ -154,14 +152,14 @@ public class Monopoly {
 		}
 		
 		
-		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
+		
 			if(currPlayer.getPosition() == 30){
 				int positionFromJail = currPlayer.getPositionsFromJail();
 				currPlayer.moveToJail(positionFromJail);
 				currPlayer.inJail = true;
 				rollDone = true;
 			}
-		}
+		
 		
 		return;
 	}
@@ -229,14 +227,10 @@ public class Monopoly {
 						if (currPlayer.getBalance()>= fine) {
 							currPlayer.doTransaction(-fine);
 							ui.displayTransaction(currPlayer, jail);
-						}
-						
+					}
 				}
-				
 			}
-			
-		}
-		
+		}	
 	}
 	
 	
@@ -477,9 +471,13 @@ public class Monopoly {
 				case UI.CMD_DONE :
 					processDone();
 					break;
-				case UI.CMD_QUIT : 
-					turnFinished = true;
-					gameOver = true;
+				case UI.CMD_PAY_10 : 
+					currPlayer.doTransaction(-10);
+					turnFinished = false;
+					break;
+				case UI.CMD_TAKE_CHANCE : 
+					Cards.Chance();
+					turnFinished = false; 
 					break;
 			}
 			if(board.getSquare(currPlayer.getPosition()) instanceof Property){

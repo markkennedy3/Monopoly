@@ -22,7 +22,7 @@ public static void CommunityChest()
     case 1 :
     	//Advance to Go//
     	//just needs linked in right//
-    	
+    	ui.displayString(currPlayer+" must advance to go");
     	currPlayer.moveToGo();
     	ui.displayMovedToGo(currPlayer);
     	
@@ -30,7 +30,7 @@ public static void CommunityChest()
     
     case 2 :
     	//Go Back to UCD Bike Shop//
-    	
+    	ui.displayString(currPlayer+" has to move to ucd bikeshop");
     	currPlayer.moveToBikeShop();
     	ui.displayMovedToBikeShop(currPlayer);
     	
@@ -46,24 +46,28 @@ public static void CommunityChest()
     case 4 :
     	//Pay 100 to hospital//
     	currPlayer.doTransaction(-100);
+    	ui.displayString(currPlayer+" visited the hospital");
     	ui.displayBankTransaction(currPlayer);
     	break;
     	
     case 5 :
     	//Pay 50 to doctor//
     	currPlayer.doTransaction(-50);
+    	ui.displayString(currPlayer+" visited the doctor");
     	ui.displayBankTransaction(currPlayer);
     	break;
     
     case 6 :
     	//Pay 50 insureance
     	currPlayer.doTransaction(-50);
+    	ui.displayString(currPlayer+" has to pay for insurance");
     	ui.displayBankTransaction(currPlayer);
     	break;
     	
     case 7 :
-    	//Bank favour+200
+    	//Bank error +200
     	currPlayer.doTransaction(+200);
+    	ui.displayString(currPlayer+" has profited from a bank error");
     	ui.displayBankTransaction(currPlayer);
     	break;
     
@@ -74,14 +78,16 @@ public static void CommunityChest()
     	break;
     	
     case 9 :
-    	//Inhert 100
+    	//Inherit 100
     	currPlayer.doTransaction(+100);
+    	ui.displayString(currPlayer+" has inherited 100 euro");
     	ui.displayBankTransaction(currPlayer);
     	break;
     
     case 10 :
     	//stock sale +50
     	currPlayer.doTransaction(+50);
+    	ui.displayString(currPlayer+" has sold some stock");
     	ui.displayBankTransaction(currPlayer);
     	break;
     	
@@ -94,20 +100,30 @@ public static void CommunityChest()
     case 12 :
     	//income tax refund +20
     	currPlayer.doTransaction(+20);
+    	ui.displayString(currPlayer+" got a tax refund of 20 euro");
     	ui.displayBankTransaction(currPlayer);
     	break;
     	
     case 13 :
-    	//beuey contest +10
+    	//beauty contest +10
     	currPlayer.doTransaction(+10);
+    	ui.displayString(currPlayer+" won a beauty contest");
     	ui.displayBankTransaction(currPlayer);
     	break;
     
     case 14 :
     	//birthday 10 from each player
-    	
-    	//leave for later//
-    	
+    	ui.displayString("Happy Birthday "+currPlayer+" collect 10 euro from each player");
+    	for (Player p : players.get()) {
+    		if( p != currPlayer){
+    		currPlayer.doTransaction(+10);
+    		currPlayer.doTransaction(-10);
+    		ui.displayTransaction(currPlayer, p);
+    		}
+    		else{
+    			return;
+    		}
+		}
     	break;
     	
     case 15 :
@@ -116,6 +132,8 @@ public static void CommunityChest()
     
     case 16 :
     	//pay 10 or take chance
+    	ui.displayString("Pay 10 or Take Chance");
+    	
     	break;
     	
     default :
@@ -138,9 +156,9 @@ public static void Chance()
     case 1 :
     	//Advance to Go//
     	//just needs linked in right//
-    	
+    	ui.displayString(currPlayer+" must advance to go");
     	currPlayer.moveToGo();
-    	
+    	ui.displayMovedToGo(currPlayer);
     	break;
     
     case 2 :

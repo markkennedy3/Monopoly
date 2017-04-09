@@ -26,6 +26,9 @@ public class UI {
 	public static final int CMD_SELL = 14;
 	public static final int CMD_REDEEM = 15;
 	public static final int CMD_DEMOLISH = 16;
+	public static final int CMD_PAY_10 = 17;
+	public static final int CMD_TAKE_CHANCE = 18;
+	
 	
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
@@ -239,7 +242,14 @@ public class UI {
 					commandId = CMD_HELP;
 					inputValid = hasNoArgument(words);
 					break;
-				
+				case "pay 10" :
+					commandId = CMD_PAY_10;
+					inputValid = true;
+					break;
+				case "take chance" :
+					commandId = CMD_TAKE_CHANCE;
+					inputValid = true;
+					break;
 				default:
 					inputValid = false;
 				}
