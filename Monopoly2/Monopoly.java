@@ -123,16 +123,12 @@ public class Monopoly {
 		//takes 200 from balance when square is landed on
 		
 		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
-			if(currPlayer.getPosition() == 0 || currPlayer.getPosition() == 38){
-				currPlayer.doTransaction(-TAX_MONEY);
-				ui.displayBankTransaction(currPlayer);
-				ui.displaySquare(currPlayer, board, dice);
+			if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){
+				processPayTax();
 			}
 		}
 		
-		
-		
-		if(board.getSquare(currPlayer.getPosition()) instanceof Property){
+			if(board.getSquare(currPlayer.getPosition()) instanceof Property){
 			if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){
 				Cards.CommunityChest();
 				ui.displayLandedOnCommunityChest(currPlayer);
@@ -147,7 +143,6 @@ public class Monopoly {
 				ui.displaySquare(currPlayer, board, dice);
 			}
 		}
-		
 		
 		
 		if(numOfDoubles == 3){//If there are 3 doubles in a row
@@ -245,26 +240,29 @@ public class Monopoly {
 	}
 	
 	
-	/*
-	private void PayTax(){
-		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
-			Property property = (Property) board.getSquare(currPlayer.getPosition());
-			if (property.onTax() == true) {
-						int taxfine = property.getTaxFine();
-						Player tax = null;
-						if (currPlayer.getBalance()>= taxfine) {
-							currPlayer.doTransaction(-taxfine);
-							ui.displayTransaction(currPlayer, tax);
-						
-						
-				}
-				
+	
+	private void processPayTax(){
+		if (currPlayer.getPosition() ==  4) {
+						if (currPlayer.getBalance()>= 150) {
+							currPlayer.doTransaction(-150);
+							ui.displayBankTransaction(currPlayer);
+							ui.displayString(currPlayer+" paid Income Tax");
+						}	
+						else{
+							ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
+						}
 			}
-			
-		}
-		
-	}
-	*/
+		if (currPlayer.getPosition() ==  38) {
+			if (currPlayer.getBalance()>= 100) {
+				currPlayer.doTransaction(-100);
+				ui.displayBankTransaction(currPlayer);
+				ui.displayString(currPlayer+" paid Super Tax");
+			}	
+			else{
+				ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
+			}
+}
+	}		
 	
 	private void processBuild () {
 		Property property = ui.getInputProperty();
