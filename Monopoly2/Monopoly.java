@@ -119,68 +119,19 @@ public class Monopoly {
 			numOfDoubles += 1;
 		}
 		
-	
-			if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){
-				processPayTax();
-			}
-	
-		
-		
-			if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){
-				Cards.CommunityChest();
-				ui.displayLandedOnCommunityChest(currPlayer);
-				ui.displaySquare(currPlayer, board, dice);
-			}
-		
-		
-	
-			if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){
-				Cards.Chance();
-				ui.displayLandedOnChance(currPlayer);
-				ui.displaySquare(currPlayer, board, dice);
-				turnFinished = false;
-			}
-		
-		
-		
-		if(numOfDoubles == 3){//If there are 3 doubles in a row
-			
-			int positionFromJail = currPlayer.getPositionsFromJail();
-			currPlayer.moveToJail(positionFromJail);
-			currPlayer.inJail = true;
-			rollDone = true;
-		}
-		
-		
-		
-			if(currPlayer.getPosition() == 30){
-				int positionFromJail = currPlayer.getPositionsFromJail();
-				currPlayer.moveToJail(positionFromJail);
-				currPlayer.inJail = true;
-				rollDone = true;
-			}
-		
-		
-		return;
-	}
-
-	private void processPayRent () {
 		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
 			Property property = (Property) board.getSquare(currPlayer.getPosition());
 			if (property.isOwned()) {
 				if (!property.getOwner().equals(currPlayer)) {
 					if (!rentPaid) {
-						int rent = property.getRent();
-						if (currPlayer.getBalance()>=rent) {
+						    int rent = property.getRent();
 							Player owner = property.getOwner();
 							currPlayer.doTransaction(-rent);
 							owner.doTransaction(+rent);
 							ui.displayTransaction(currPlayer, owner);
 							rentPaid = true;	
 							rentOwed = false;
-						} else {
-							ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);										
-						} 
+						
 					} else {
 						ui.displayError(UI.ERR_RENT_ALREADY_PAID);									
 					}
@@ -190,11 +141,48 @@ public class Monopoly {
 			} else {
 				ui.displayError(UI.ERR_NOT_OWNED);							
 			}
-		} else {
-			ui.displayError(UI.ERR_NOT_A_PROPERTY);
+		} 
+	
+		
+	
+		if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){
+			processPayTax();
 		}
+	
+		
+		if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){
+			Cards.CommunityChest();
+			ui.displayLandedOnCommunityChest(currPlayer);
+			ui.displaySquare(currPlayer, board, dice);
+     	}
+		
+		
+	
+		if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){
+            Cards.Chance();
+			ui.displayLandedOnChance(currPlayer);
+			ui.displaySquare(currPlayer, board, dice);
+			turnFinished = false;
+		}
+		
+		
+		if(numOfDoubles == 3){//If there are 3 doubles in a row
+     		int positionFromJail = currPlayer.getPositionsFromJail();
+			currPlayer.moveToJail(positionFromJail);
+			currPlayer.inJail = true;
+			rollDone = true;
+		}
+		
+		if(currPlayer.getPosition() == 30){
+				int positionFromJail = currPlayer.getPositionsFromJail();
+				currPlayer.moveToJail(positionFromJail);
+				currPlayer.inJail = true;
+				rollDone = true;
+			}
 		return;
 	}
+
+	
 
 	private void processBuy () {
 		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
@@ -404,9 +392,6 @@ public class Monopoly {
 			switch (ui.getCommandId()) {
 				case UI.CMD_ROLL :
 					processRoll();
-					break;
-				case UI.CMD_PAY_RENT :
-					processPayRent();
 					break;
 				case UI.CMD_BUY :
 					if(currPlayer.isInJail() == true){
