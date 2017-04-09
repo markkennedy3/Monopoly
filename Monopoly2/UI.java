@@ -52,6 +52,7 @@ public class UI {
 	public static final int ERR_IS_NOT_MORTGAGED = 19;
 	public static final int SITE_IS_MORTGAGED = 20;
 	public static final int ERR_IN_JAIL = 21;
+	public static final int ERR_NEG_BALANCE = 22;
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
@@ -75,7 +76,8 @@ public class UI {
 		"Error: The property has already been mortgaged.",
 		"Error: The property has not been mortgaged.",
 		"Error: The property has been mortgaged.",
-		"Error: You are in jail you cannot do this command"
+		"Error: You are in jail you cannot do this command",
+		"Error: Your balance is negative please mortgage/sell property to make balance positive"
 	};
 	
 	private JFrame frame = new JFrame();
@@ -476,6 +478,27 @@ public class UI {
 	
 	public void displayLandedOnChance (Player player) {
 		infoPanel.displayString(player + " landed on Chance!.");
+		return;
+	}
+
+	public void displayGetOutOfJail(Player player) {
+		infoPanel.displayString(player + "has rolled a double and is now out of jail");
+		
+	}
+
+	public void displayNotGetOutOfJail(Player player) {
+		infoPanel.displayString(player + "has not rolled a double and will remain in jail");
+		return;
+		
+	}
+
+	public void displayFine(Player player) {
+		infoPanel.displayString(player + "has not rolled a double and pays the fine and is now out of jail");
+		return;
+	}
+
+	public void displayRolledToJail(Player player) {
+		infoPanel.displayString(player + "has somehow rolled 3 doubles in a row and is now moved to jail");
 		return;
 	}
 }

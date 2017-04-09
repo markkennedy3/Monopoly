@@ -5,6 +5,7 @@ public class Monopoly {
 
 	private static final int START_MONEY = 1500;
 	private static final int GO_MONEY = 200;
+	private static final int TAX_MONEY = 200;
 	
 	private Players players = new Players();
 	public Player currPlayer;
@@ -18,6 +19,7 @@ public class Monopoly {
 	private boolean rentOwed;
 	private boolean rentPaid;
 	private int numOfDoubles;
+	private int numOfStrikes;
 	
 	Monopoly () {
 		ui.display();
@@ -85,6 +87,27 @@ public class Monopoly {
 	}
 	
 	private void processRoll () {
+		if(currPlayer.isInJail() == true){
+			dice.roll();
+			ui.displayDice(currPlayer, dice);
+			if(dice.isDouble()){
+				currPlayer.move(dice.getTotal());
+				ui.displayGetOutOfJail(currPlayer);
+			}
+			else{
+				numOfStrikes += 1;
+				ui.displayNotGetOutOfJail(currPlayer);//Different display for not getting out of jail
+				if(numOfStrikes == 3){
+					currPlayer.move(dice.getTotal());
+					
+					int fine = currPlayer.getFine();
+					currPlayer.payFine(-fine);
+					ui.displayFine(currPlayer);
+					currPlayer.inJail = false;
+					
+				}
+			}
+		}else{
 		if (!rollDone) {
 			if (!rentOwed) {
 				dice.roll();
@@ -117,6 +140,7 @@ public class Monopoly {
 		} else {
 			ui.displayError(UI.ERR_DOUBLE_ROLL);
 			numOfDoubles += 1;
+		}
 		}
 		
 		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
@@ -173,12 +197,15 @@ public class Monopoly {
 			rollDone = true;
 		}
 		
+		if(board.getSquare(currPlayer.getPosition()) instanceof Square){
 		if(currPlayer.getPosition() == 30){
-				int positionFromJail = currPlayer.getPositionsFromJail();
-				currPlayer.moveToJail(positionFromJail);
-				currPlayer.inJail = true;
-				rollDone = true;
+			int positionFromJail = currPlayer.getPositionsFromJail();
+			currPlayer.moveToJail(positionFromJail);
+			ui.displayRolledToJail(currPlayer);
+			currPlayer.inJail = true;
+			rollDone = true;
 			}
+		}
 		return;
 	}
 
@@ -376,6 +403,9 @@ public class Monopoly {
 			} else {
 				ui.displayError(UI.ERR_RENT_OWED);
 			}
+			if(currPlayer.getBalance() < 0){
+				ui.displayError(UI.ERR_NEG_BALANCE);
+			}
 		} else {
 			ui.displayError(UI.ERR_NO_ROLL);
 		}
@@ -394,62 +424,30 @@ public class Monopoly {
 					processRoll();
 					break;
 				case UI.CMD_BUY :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
 					processBuy();
 					break;
-					}
 				case UI.CMD_BALANCE :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
 					ui.displayBalance(currPlayer);
 					break;
-					}
 				case UI.CMD_PROPERTY :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
 					ui.displayProperty(currPlayer);
 					break;
-					}
 				case UI.CMD_BANKRUPT :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
 					processBankrupt();
 					turnFinished = true;
 					break;
-					}
 				case UI.CMD_BUILD :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
 					processBuild();
 					break;
-					}
 				case UI.CMD_DEMOLISH :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
 					processDemolish();
 					break;
-					}
 				case UI.CMD_REDEEM :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
 					processRedeem();
 					break;
-					}
 				case UI.CMD_MORTGAGE :
-					if(currPlayer.isInJail() == true){
-						ui.displayError(UI.ERR_IN_JAIL);
-					}else{
 					processMortgage();
 					break;
-					}
 				case UI.CMD_HELP :
 					ui.displayCommandHelp();
 					break;

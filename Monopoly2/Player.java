@@ -11,6 +11,7 @@ public class Player {
 	private boolean passedGo;
 	boolean inJail;
 	int posFromJail;
+	int fine;
 	private ArrayList<Property> properties = new ArrayList<Property>();
 	
 // CONSTRUCTORS
@@ -24,6 +25,7 @@ public class Player {
 		passedGo = false;
 		inJail = false;
 		posFromJail = 0;
+		fine = 50;
 		return;
 	}
 	
@@ -85,6 +87,17 @@ public class Player {
 			position = position + Board.NUM_SQUARES;
 			passedGo = false;
 		} 
+	}
+	public int getFine() {
+		
+		return fine;
+	}
+
+	public void payFine(int amount) {
+		balance = balance + amount;
+		this.amount = amount;
+		return;
+		
 	}
 	
 	//Michael//
@@ -189,6 +202,8 @@ public class Player {
 	public void CommunityChest()
 	{
 	}
+
+	
 	
 
 }
