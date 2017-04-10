@@ -12,6 +12,8 @@ public class Player {
 	boolean inJail;
 	int posFromJail;
 	int fine;
+	int numOfStrikes;
+	int numOfDoubles;
 	private ArrayList<Property> properties = new ArrayList<Property>();
 	
 // CONSTRUCTORS
@@ -112,6 +114,26 @@ public class Player {
 		return position;
 	}
 	
+	public int moveToBelgrove (){
+		position = 11;
+		return position;
+	}
+	
+	public int moveToClubhouse (){
+		position = 24;
+		return position;
+	}
+	
+	public int moveToDrumcondra (){
+		position = 15;
+		return position;
+	}
+	
+	public int moveToLaw (){
+		position = 39;
+		return position;
+	}
+	
 	public boolean passedGo () {
 		return passedGo;
 	}
@@ -199,9 +221,7 @@ public class Player {
 		return name + " (" + tokenName + ")";
 	}
 	
-	public void CommunityChest()
-	{
-	}
+	
 
 	
 	

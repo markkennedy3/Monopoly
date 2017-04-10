@@ -9,7 +9,7 @@ public class Cards {
 	private static UI ui = new UI(players, board);
 	
 	
-public void CommunityChest() 
+public static void CommunityChest(Player currPlayer) 
 
 {
 	randomNumber =  (int)(Math.random()*16+1);
@@ -146,7 +146,7 @@ public void CommunityChest()
 }
 
 
-public void Chance() 
+public static void Chance(Player currPlayer) 
 
 {
 	randomNumber =  (int)(Math.random()*16+1);
@@ -178,24 +178,71 @@ public void Chance()
     	//Go To pal mall(belgrove) if you pass go collect 200//
     	
     	
+    	if(currPlayer.getPosition() > 11){
+    		currPlayer.doTransaction(+200);
+    		currPlayer.moveToBelgrove();
+    		ui.displayString(currPlayer+" has been moved to Belgrove and has passed go and" + currPlayer + "has collected 200 euro");
+    	}
+    	else if(currPlayer.getPosition() < 11){
+    		currPlayer.moveToBelgrove();
+    		ui.displayString(currPlayer+" has been moved to Belgrove");
+    	}
+    	else if(currPlayer.getPosition() == 11){
+    		
+    	}
+    	
     	
     	
     	break;
     
     case 4 :
     	//Take a trip to Marylebone Station(drumcondra) and if you pass Go collect £200.//
+    	if(currPlayer.getPosition() > 15){
+    		currPlayer.doTransaction(+200);
+    		currPlayer.moveToDrumcondra();
+    		ui.displayString(currPlayer+" has been moved to Drumcondra and has passed go and" + currPlayer + "has collected 200 euro");
+    	}
+    	else if(currPlayer.getPosition() < 15){
+    		currPlayer.moveToDrumcondra();
+    	}
+    	else if(currPlayer.moveToDrumcondra() == 15){
+    		
+    	}
     	break;
     	
     case 5 :
     	//Advance to Trafalgar Square(student bar). If you pass Go collect £200.//
+    	if(currPlayer.getPosition() > 24){
+    		currPlayer.doTransaction(+200);
+    		currPlayer.moveToClubhouse();
+    		ui.displayString(currPlayer+" has been moved to the Clubhouse and has passed go and" + currPlayer + "has collected 200 euro");
+    	}
+    	else if(currPlayer.getPosition() < 24){
+    		currPlayer.moveToClubhouse();
+    	}
+    	else if(currPlayer.getPosition() == 24){
+    		
+    	}
     	break;
     
     case 6 :
     	//Advance to Mayfair(sutherland)
+    	if(currPlayer.getPosition() > 39){
+    		currPlayer.doTransaction(+200);
+    		currPlayer.moveToLaw();
+    		ui.displayString(currPlayer+" has been moved to Sutherland and has passed go and" + currPlayer + "has collected 200 euro");
+    	}
+    	else if(currPlayer.getPosition() < 24){
+    		currPlayer.moveToLaw();
+    	}
+    	else if(currPlayer.getPosition() == 24){
+    		
+    	}
     	break;
     	
     case 7 :
     	//go back 3 spaces
+    	currPlayer.move(-3);
     	break;
     
     case 8 :

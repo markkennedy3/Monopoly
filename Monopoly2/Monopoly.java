@@ -88,32 +88,71 @@ public class Monopoly {
 	}
 	
 	private void processRoll () {
+		if(currPlayer.isInJail() == true && rollDone == true){
+			ui.displayError(UI.ERR_TOO_MANY_ROLLS);
+		}
 		if(currPlayer.isInJail() == true){
 			dice.roll();
 			ui.displayDice(currPlayer, dice);
 			if(dice.isDouble()){
 				currPlayer.move(dice.getTotal());
 				ui.displayGetOutOfJail(currPlayer);
+				ui.displaySquare(currPlayer, board, dice);
+				ui.display();
+				rollDone = false;
+				currPlayer.inJail = false;
+				if(!rentOwed){
+					if (board.getSquare(currPlayer.getPosition()) instanceof Property && 
+							((Property) board.getSquare(currPlayer.getPosition())).isOwned() &&
+							!((Property) board.getSquare(currPlayer.getPosition())).getOwner().equals(currPlayer) ) {
+								rentOwed = true;
+								rentPaid = false;
+					} else {
+						rentOwed = false;
+					}
+					
+				
+				}
+				if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
+					Property property = (Property) board.getSquare(currPlayer.getPosition());
+					if (property.isOwned()) {
+						if (!property.getOwner().equals(currPlayer)) {
+							if (!rentPaid) {
+								    int rent = property.getRent();
+									Player owner = property.getOwner();
+									currPlayer.doTransaction(-rent);
+									owner.doTransaction(+rent);
+									ui.displayTransaction(currPlayer, owner);
+									rentPaid = true;	
+									rentOwed = false;
+								
+							} 
+						} 
+					} 
+				} 
 			}
 			else{
-				numOfStrikes += 1;
+				currPlayer.numOfStrikes += 1;
 				ui.displayNotGetOutOfJail(currPlayer);//Different display for not getting out of jail
-				if(numOfStrikes == 3){
+				rollDone = true;
+				if(currPlayer.numOfStrikes == 3){//if the player has not rolled a double in 3 turns
 					currPlayer.move(dice.getTotal());
 					
 					int fine = currPlayer.getFine();
 					currPlayer.payFine(-fine);
 					ui.displayFine(currPlayer);
 					currPlayer.inJail = false;
+					ui.displaySquare(currPlayer, board, dice);
+					ui.display();
 					
 				}
 			}
 		}else{
-		if (!rollDone) {
+		if (rollDone == false) {
 			if (!rentOwed) {
 				dice.roll();
 				ui.displayDice(currPlayer, dice);
-				//currPlayer.move(30); testing jail
+				//currPlayer.move(30); jail test
 				currPlayer.move(dice.getTotal());
 				ui.display();
 				
@@ -141,7 +180,7 @@ public class Monopoly {
 			}
 		} else {
 			ui.displayError(UI.ERR_DOUBLE_ROLL);
-			numOfDoubles += 1;
+			currPlayer.numOfDoubles += 1;
 		}
 		}
 		
@@ -164,9 +203,7 @@ public class Monopoly {
 				} else {
 					ui.displayError(UI.ERR_SELF_OWNED);								
 				}
-			} else {
-				ui.displayError(UI.ERR_NOT_OWNED);							
-			}
+			} 
 		} 
 	
 		
@@ -177,23 +214,22 @@ public class Monopoly {
 	
 		
 		if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){
-			Cards.CommunityChest();
+			Cards.CommunityChest(currPlayer);
 			ui.displayLandedOnCommunityChest(currPlayer);
-			ui.displaySquare(currPlayer, board, dice);
+			
      	}
 		
 		
 	
 		if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){
-            Cards.Chance();
-            
+            Cards.Chance(currPlayer);
 			ui.displayLandedOnChance(currPlayer);
-			ui.displaySquare(currPlayer, board, dice);
+			
 			turnFinished = false;
 		}
 		
 		
-		if(numOfDoubles == 3){//If there are 3 doubles in a row
+		if(currPlayer.numOfDoubles == 3){//If there are 3 doubles in a row
      		int positionFromJail = currPlayer.getPositionsFromJail();
 			currPlayer.moveToJail(positionFromJail);
 			currPlayer.inJail = true;
@@ -201,17 +237,16 @@ public class Monopoly {
 		}
 		
 		if(board.getSquare(currPlayer.getPosition()) instanceof Square){
-		if(currPlayer.getPosition() == 30){
+		if(currPlayer.getPosition() == 30){//if the person is on go to jail
 			int positionFromJail = currPlayer.getPositionsFromJail();
 			currPlayer.moveToJail(positionFromJail);
-			ui.displayRolledToJail(currPlayer);
+			ui.displayMovedToJail(currPlayer);
 			currPlayer.inJail = true;
 			rollDone = true;
 			}
 		}
 		return;
 	}
-
 	
 
 	private void processBuy () {
@@ -259,6 +294,7 @@ public class Monopoly {
 							currPlayer.doTransaction(-150);
 							ui.displayBankTransaction(currPlayer);
 							ui.displayString(currPlayer+" paid Income Tax");
+							rollDone = true;
 						}	
 						else{
 							ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
@@ -269,6 +305,7 @@ public class Monopoly {
 				currPlayer.doTransaction(-100);
 				ui.displayBankTransaction(currPlayer);
 				ui.displayString(currPlayer+" paid Super Tax");
+				rollDone = true;
 			}	
 			else{
 				ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
