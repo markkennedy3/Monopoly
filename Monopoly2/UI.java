@@ -26,8 +26,11 @@ public class UI {
 	public static final int CMD_SELL = 14;
 	public static final int CMD_REDEEM = 15;
 	public static final int CMD_DEMOLISH = 16;
-	public static final int CMD_PAY_10 = 17;
+	public static final int CMD_PAY_10 = 17; //additional commands//
 	public static final int CMD_TAKE_CHANCE = 18;
+	public static final int CMD_PAY_FINE = 19;
+	public static final int CMD_USE_CARD = 20;
+	
 	
 	
 	public static final int ERR_SYNTAX = 0;
@@ -52,8 +55,11 @@ public class UI {
 	public static final int ERR_IS_NOT_MORTGAGED = 19;
 	public static final int SITE_IS_MORTGAGED = 20;
 	public static final int ERR_IN_JAIL = 21;
-	public static final int ERR_NEG_BALANCE = 22;
+	public static final int ERR_NEG_BALANCE = 22; //additional errors//
 	public static final int ERR_TOO_MANY_ROLLS = 23;
+	public static final int ERR_NOT_IN_JAIL = 24;
+	public static final int ERR_NO_CARD = 25;
+	
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
@@ -79,7 +85,10 @@ public class UI {
 		"Error: The property has been mortgaged.",
 		"Error: You are in jail you cannot do this command",
 		"Error: Your balance is negative please mortgage/sell property to make balance positive",
-		"Error: Too Many Rolls"
+		"Error: Too Many Rolls",
+		"Error: You are not in jail",
+		"Error: You have no card"
+		
 	};
 	
 	private JFrame frame = new JFrame();
@@ -185,12 +194,8 @@ public class UI {
 					inputValid = hasNoArgument(words);
 					break;
 				case "pay" :
-					commandId = CMD_PAY_RENT;
-					if (hasOneArgument(words) && words[1].equals("rent")) {
-						inputValid = true;
-					} else {
-						inputValid = false;
-					}
+					commandId = CMD_PAY_FINE;
+					inputValid = hasNoArgument(words);
 					break;
 				case "property" :
 					commandId = CMD_PROPERTY;
@@ -204,6 +209,7 @@ public class UI {
 					commandId = CMD_BANKRUPT;
 					inputValid = hasNoArgument(words);
 					break;
+				
 				case "mortgage" :
 					commandId = CMD_MORTGAGE;
 					if (hasOneArgument(words) && board.isProperty(words[1])) { 
@@ -246,13 +252,20 @@ public class UI {
 					commandId = CMD_HELP;
 					inputValid = hasNoArgument(words);
 					break;
-				case "pay 10" :
+				case "pay10" :
 					commandId = CMD_PAY_10;
 					inputValid = true;
+					inputValid = hasNoArgument(words);
 					break;
-				case "take chance" :
+				case "chance" :
 					commandId = CMD_TAKE_CHANCE;
 					inputValid = true;
+					inputValid = hasNoArgument(words);
+					break;
+				case "card" :
+					commandId = CMD_USE_CARD;
+					inputValid = true;
+					inputValid = hasNoArgument(words);
 					break;
 				default:
 					inputValid = false;
@@ -272,6 +285,8 @@ public class UI {
 	public String getString () {
 		return string; 
 	}
+	
+	
 	
 	public String getTokenName (int tokenId) {
 		return boardPanel.getTokenName(tokenId);

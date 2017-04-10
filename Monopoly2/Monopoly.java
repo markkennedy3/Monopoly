@@ -6,7 +6,6 @@ public class Monopoly {
 
 	private static final int START_MONEY = 1500;
 	private static final int GO_MONEY = 200;
-	private static final int TAX_MONEY = 200;
 	private static int randomNumber;
 	private Players players = new Players();
 	public Player currPlayer;
@@ -19,8 +18,6 @@ public class Monopoly {
 	private boolean rollDone;
 	private boolean rentOwed;
 	private boolean rentPaid;
-	private int numOfDoubles;
-	private int numOfStrikes;
 	
 	Monopoly () {
 		ui.display();
@@ -88,20 +85,24 @@ public class Monopoly {
 	}
 	
 	private void processRoll () {
-		if(currPlayer.isInJail() == true && rollDone == true){
+		if((currPlayer.getBalance() < 0)){ //if balance is negative you cant roll//
+			ui.displayError(UI.ERR_NEG_BALANCE);
+			
+		}
+		if(currPlayer.isInJail() == true && rollDone == true){ 
 			ui.displayError(UI.ERR_TOO_MANY_ROLLS);
 		}
-		if(currPlayer.isInJail() == true){
+		if(currPlayer.isInJail() == true){ //if player in jail
 			dice.roll();
 			ui.displayDice(currPlayer, dice);
-			if(dice.isDouble()){
+			if(dice.isDouble()){ //if dice is double
 				currPlayer.move(dice.getTotal());
 				ui.displayGetOutOfJail(currPlayer);
 				ui.displaySquare(currPlayer, board, dice);
 				ui.display();
 				rollDone = false;
-				currPlayer.inJail = false;
-				if(!rentOwed){
+				currPlayer.inJail = false; //player gets out of jail
+				if(!rentOwed){ //normal moving functionality
 					if (board.getSquare(currPlayer.getPosition()) instanceof Property && 
 							((Property) board.getSquare(currPlayer.getPosition())).isOwned() &&
 							!((Property) board.getSquare(currPlayer.getPosition())).getOwner().equals(currPlayer) ) {
@@ -131,14 +132,14 @@ public class Monopoly {
 					} 
 				} 
 			}
-			else{
+			else{ //if player doesnt roll double
 				currPlayer.numOfStrikes += 1;
 				ui.displayNotGetOutOfJail(currPlayer);//Different display for not getting out of jail
 				rollDone = true;
 				if(currPlayer.numOfStrikes == 3){//if the player has not rolled a double in 3 turns
 					currPlayer.move(dice.getTotal());
 					
-					int fine = currPlayer.getFine();
+					int fine = currPlayer.getFine(); //pay fine method
 					currPlayer.payFine(-fine);
 					ui.displayFine(currPlayer);
 					currPlayer.inJail = false;
@@ -148,12 +149,12 @@ public class Monopoly {
 				}
 			}
 		}else{
-		if (rollDone == false) {
+		if (rollDone == false) { //if player still has roll
 			if (!rentOwed) {
 				dice.roll();
 				ui.displayDice(currPlayer, dice);
-				currPlayer.move(2); //jail test
-				//currPlayer.move(dice.getTotal());
+				//currPlayer.move(30); //jail test
+				currPlayer.move(dice.getTotal());
 				ui.display();
 				
 				if (currPlayer.passedGo()) {
@@ -208,22 +209,35 @@ public class Monopoly {
 	
 		
 	
-		if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){
+		if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){ //checks if player position on square then takes from balance
 			processPayTax();
 		}
 	
 		
-		if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){
+		if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){ //checks if player position on square then plays card
+			if(!dice.isDouble()){
 			CommunityChest(currPlayer);
 			ui.displayLandedOnCommunityChest(currPlayer);
+			rollDone=true;
+			}
+			else{
+				rollDone=false;
+			}
 			
+			turnFinished = false;
      	}
 		
 		
 	
-		if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){
+		if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){ //checks if player position on square then plays card
+			if(!dice.isDouble()){
             Chance(currPlayer);
 			ui.displayLandedOnChance(currPlayer);
+			rollDone=true;
+			}
+			else{
+				rollDone=false;
+			}
 			
 			turnFinished = false;
 		}
@@ -270,34 +284,18 @@ public class Monopoly {
 		return;
 	}
 	
-	private void PayFromJail(){
-		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
-			Property property = (Property) board.getSquare(currPlayer.getPosition());
-			if (property.isJail() == true) {
-				if (currPlayer.isInJail() == true && property.isFinePaid() == false) {
-						int fine = property.getJailFine();
-						Player jail = null;
-						if (currPlayer.getBalance()>= fine) {
-							currPlayer.doTransaction(-fine);
-							ui.displayTransaction(currPlayer, jail);
-					}
-				}
-			}
-		}	
-	}
 	
 	
-	
-	private void processPayTax(){
+	private void processPayTax(){  
 		if (currPlayer.getPosition() ==  4) {
-						if (currPlayer.getBalance()>= 150) {
-							currPlayer.doTransaction(-150);
+						if (currPlayer.getBalance()>= 150) { //checks if player has enough for balance
+							currPlayer.doTransaction(-150); //does transaction
 							ui.displayBankTransaction(currPlayer);
 							ui.displayString(currPlayer+" paid Income Tax");
 							rollDone = true;
 						}	
 						else{
-							ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
+							ui.displayError(UI.ERR_INSUFFICIENT_FUNDS); //err message
 						}
 			}
 		if (currPlayer.getPosition() ==  38) {
@@ -393,7 +391,17 @@ public class Monopoly {
 		return;
 	}
 	
-
+public void processPayFromJail(){ 
+	if (currPlayer.isInJail() == true){ //checks if in jail
+		int fine = currPlayer.getFine();
+		currPlayer.payFine(-fine); //takes fine
+		ui.displayFine(currPlayer);
+		currPlayer.inJail = false; //player no longer in jail
+	}else{
+		ui.displayError(UI.ERR_NOT_IN_JAIL);
+	}
+	
+}
 		
 	public void processMortgage () {
 		Property property = ui.getInputProperty();
@@ -494,14 +502,22 @@ public class Monopoly {
 				case UI.CMD_DONE :
 					processDone();
 					break;
-				case UI.CMD_PAY_10 : 
-					currPlayer.doTransaction(-10);
+				case UI.CMD_PAY_10 : 			//additional processes below
+					processPayDebt();
 					turnFinished = false;
 					break;
 				case UI.CMD_TAKE_CHANCE : 
-					//Cards.Chance();
+					processTakeChance();
 					turnFinished = false; 
 					break;
+				case UI.CMD_PAY_FINE :
+					processPayFromJail();
+					break;
+				case UI.CMD_USE_CARD :
+					processUseCard();
+					break;
+					
+					
 			}
 			if(board.getSquare(currPlayer.getPosition()) instanceof Property){
 				Property property = (Property) board.getSquare(currPlayer.getPosition());
@@ -516,6 +532,17 @@ public class Monopoly {
 	
 	
 	
+	private void processUseCard() { //use card functionality
+		if(currPlayer.hasGetOutOfJailCard() == true && currPlayer.isInJail() == true){
+			currPlayer.inJail = false;
+		}
+		else{
+			ui.displayError(UI.ERR_NO_CARD);
+		}
+		}
+		
+	
+
 	public void nextPlayer () {
 		currPlayer = players.getNextPlayer(currPlayer);
 		return;
@@ -552,12 +579,13 @@ public class Monopoly {
 	public void CommunityChest(Player currPlayer) 
 
 	{
-		randomNumber =  (int)(Math.random()*16+1);
+		randomNumber =  (int)(Math.random()*16+1);//Randomizes number out of 16
 
 	    switch(randomNumber) 
 	    
 	    {
 	    
+	    //each statement
 	    
 	    case 1 :
 	    	//Advance to Go//
@@ -671,6 +699,7 @@ public class Monopoly {
 	    	
 	    case 15 :
 	    	//get out of jail free
+	    	currPlayer.hasGetOutOfJailCard = true;
 	    	break;
 	    
 	    case 16 :
@@ -831,6 +860,7 @@ public class Monopoly {
 	    
 	    case 16 :
 	    	//Get out of jail free. This card may be kept until needed or sold.
+	    	currPlayer.hasGetOutOfJailCard = true;
 	    	break;
 	    	
 	    default :
@@ -844,7 +874,16 @@ public class Monopoly {
 	
 	
 	
+	public void processPayDebt () {
+		currPlayer.doTransaction(-10);
+		ui.displayBankTransaction(currPlayer);
+		turnFinished = false;
+	}
 	
+	public void processTakeChance () {
+		Chance(currPlayer);
+		turnFinished = false;
+	}
 	
 	
 	

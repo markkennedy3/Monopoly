@@ -1,4 +1,7 @@
 
+/*Not being used anymore*/
+
+
 /* public class Cards {
 	
 	private static int randomNumber;

@@ -14,6 +14,7 @@ public class Player {
 	int fine;
 	int numOfStrikes;
 	int numOfDoubles;
+	boolean hasGetOutOfJailCard;
 	private ArrayList<Property> properties = new ArrayList<Property>();
 	
 // CONSTRUCTORS
@@ -28,6 +29,8 @@ public class Player {
 		inJail = false;
 		posFromJail = 0;
 		fine = 50;
+		hasGetOutOfJailCard = false;
+		
 		return;
 	}
 	
@@ -102,7 +105,7 @@ public class Player {
 		
 	}
 	
-	//Michael//
+	//Card Methods to move//
 	
 	public int moveToGo (){
 		position = 1;
@@ -219,6 +222,10 @@ public class Player {
 	
 	public String toString () {
 		return name + " (" + tokenName + ")";
+	}
+
+	public boolean hasGetOutOfJailCard() { 
+		return hasGetOutOfJailCard;
 	}
 	
 	

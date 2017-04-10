@@ -1,3 +1,8 @@
+
+/*Not being used anymore*/
+
+
+
 //New Class for Jail, might scrap or move some of these functions
 public class Jail extends Square{
 
@@ -6,7 +11,6 @@ public class Jail extends Square{
 	
 	Jail(String name, int price) {
 		super(name);
-		// TODO Auto-generated constructor stub
 		inJail = false;
 		posFromJail = 0;
 		
