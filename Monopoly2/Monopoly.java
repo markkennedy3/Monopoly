@@ -1,12 +1,13 @@
 import java.util.ArrayList;
 
 
+
 public class Monopoly {
 
 	private static final int START_MONEY = 1500;
 	private static final int GO_MONEY = 200;
 	private static final int TAX_MONEY = 200;
-	
+	private static int randomNumber;
 	private Players players = new Players();
 	public Player currPlayer;
 	private Dice dice = new Dice();
@@ -112,6 +113,7 @@ public class Monopoly {
 			if (!rentOwed) {
 				dice.roll();
 				ui.displayDice(currPlayer, dice);
+				//currPlayer.move(30); testing jail
 				currPlayer.move(dice.getTotal());
 				ui.display();
 				
@@ -184,6 +186,7 @@ public class Monopoly {
 	
 		if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){
             Cards.Chance();
+            
 			ui.displayLandedOnChance(currPlayer);
 			ui.displaySquare(currPlayer, board, dice);
 			turnFinished = false;
@@ -459,7 +462,7 @@ public class Monopoly {
 					turnFinished = false;
 					break;
 				case UI.CMD_TAKE_CHANCE : 
-					Cards.Chance();
+					//Cards.Chance();
 					turnFinished = false; 
 					break;
 			}

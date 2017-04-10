@@ -9,7 +9,7 @@ public class Cards {
 	private static UI ui = new UI(players, board);
 	
 	
-public static void CommunityChest() 
+public void CommunityChest() 
 
 {
 	randomNumber =  (int)(Math.random()*16+1);
@@ -39,7 +39,10 @@ public static void CommunityChest()
     case 3 :
     	//Go To Jail//
     	
-    	//Leaving to stephen who is working on jail//
+    	int positionFromJail = currPlayer.getPositionsFromJail();
+		currPlayer.moveToJail(positionFromJail);//Moves the token positionFromJail spaces
+		ui.displayString(currPlayer + " must go to jail ");
+		currPlayer.inJail = true;//Player is now in jail
     	
     	break;
     
@@ -143,7 +146,7 @@ public static void CommunityChest()
 }
 
 
-public static void Chance() 
+public void Chance() 
 
 {
 	randomNumber =  (int)(Math.random()*16+1);
@@ -163,13 +166,17 @@ public static void Chance()
     
     case 2 :
     	//Go to jail//
+    	int positionFromJail = currPlayer.getPositionsFromJail();
+		currPlayer.moveToJail(positionFromJail);//Moves the token positionFromJail spaces
+		ui.displayString(currPlayer + " must go to jail ");
+		currPlayer.inJail = true;//Player is now in jail
     	
-    	//stephen for you//
     	
     	break;
     	
     case 3 :
     	//Go To pal mall(belgrove) if you pass go collect 200//
+    	
     	
     	
     	
@@ -242,6 +249,6 @@ public static void Chance()
     default :
         System.out.println("Invalid output");
   }
-  
+  return;
 }
 }

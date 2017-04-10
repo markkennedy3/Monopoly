@@ -88,9 +88,9 @@ public class Player {
 			passedGo = false;
 		} 
 	}
+	
 	public int getFine() {
-		
-		return fine;
+	return fine;
 	}
 
 	public void payFine(int amount) {
