@@ -1,5 +1,5 @@
 
-public class Cards {
+/* public class Cards {
 	
 	private static int randomNumber;
 	private static Players players = new Players();
@@ -298,4 +298,4 @@ public static void Chance(Player currPlayer)
   }
   return;
 }
-}
+}*/
