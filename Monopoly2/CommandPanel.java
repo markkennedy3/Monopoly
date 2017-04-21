@@ -9,7 +9,7 @@ import javax.swing.JTextField;
 public class CommandPanel extends JPanel  {
 	
 	private static final long serialVersionUID = 1L;
-	private static final int FONT_SIZE = 16;
+	private static final int FONT_SIZE = 14;
 	
 	private JTextField commandField = new JTextField(); 
 	private LinkedList<String> commandBuffer = new LinkedList<String>();
@@ -29,7 +29,7 @@ public class CommandPanel extends JPanel  {
 		   }
 		ActionListener listener = new AddActionListener();
 		commandField.addActionListener(listener);
-		commandField.setFont(new Font("Ariel", Font.PLAIN, FONT_SIZE));
+		commandField.setFont(new Font("Times New Roman", Font.PLAIN, FONT_SIZE));
 		setLayout(new BorderLayout());
 		add(commandField, BorderLayout.CENTER);
 		return;

@@ -1,5 +1,5 @@
 
-public class Dice {
+public class Dice implements DiceAPI {
 	
 	private static final int NUM_DICE = 2;
 	

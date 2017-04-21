@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 
-public class Player {
+public class Player implements PlayerAPI {
+	
+	private static final int MAX_NUM_JAIL_EXIT_ATTEMPTS = 3;
 	
 	private String name;
 	private int position;
@@ -9,13 +11,10 @@ public class Player {
 	private String tokenName;
 	private int tokenId;
 	private boolean passedGo;
-	boolean inJail;
-	int posFromJail;
-	int fine;
-	int numOfStrikes;
-	int numOfDoubles;
-	boolean hasGetOutOfJailCard;
 	private ArrayList<Property> properties = new ArrayList<Property>();
+	private boolean inJail;
+	private int numJailExitAttempts;
+	private ArrayList<Card> cards = new ArrayList<Card>();
 	
 // CONSTRUCTORS
 	
@@ -27,10 +26,6 @@ public class Player {
 		balance = 0;
 		passedGo = false;
 		inJail = false;
-		posFromJail = 0;
-		fine = 50;
-		hasGetOutOfJailCard = false;
-		
 		return;
 	}
 	
@@ -71,76 +66,68 @@ public class Player {
 		} 
 		return;
 	}
-	//Jail Methods
-	public int getPositionsFromJail (){
-		if(position >= 10){
-			posFromJail = (Board.NUM_SQUARES - position) + 10;
-		}
-		else if(position < 10){
-			posFromJail = 10 - position;
-		}
-		
-		return posFromJail;
-	}
-	public void moveToJail (int posFromJail){
-		position = position + posFromJail;
-		if (position >= Board.NUM_SQUARES) {
-			position = position - Board.NUM_SQUARES;
-			passedGo = false;
-		}
-		else if(position < 0){
-			position = position + Board.NUM_SQUARES;
-			passedGo = false;
-		} 
-	}
 	
-	public int getFine() {
-	return fine;
+	public void moveTo (int square) {
+		if (square < position) {
+			passedGo = true;
+		} else {
+			passedGo = false;
+		}
+		position = square;
+		return;
 	}
 
-	public void payFine(int amount) {
-		balance = balance + amount;
-		this.amount = amount;
-		return;
-		
-	}
-	
-	//Card Methods to move//
-	
-	public int moveToGo (){
-		position = 1;
-		return position;
-	}
-	
-	public int moveToBikeShop (){
-		position = 2;
-		return position;
-	}
-	
-	public int moveToBelgrove (){
-		position = 11;
-		return position;
-	}
-	
-	public int moveToClubhouse (){
-		position = 24;
-		return position;
-	}
-	
-	public int moveToDrumcondra (){
-		position = 15;
-		return position;
-	}
-	
-	public int moveToLaw (){
-		position = 39;
-		return position;
-	}
-	
 	public boolean passedGo () {
 		return passedGo;
 	}
 	
+	// METHODS DEALING WITH JAIL
+	
+	public void goToJail () {
+		position = Board.POS_JAIL;
+		inJail = true;
+		numJailExitAttempts = 0;
+		return;
+	}
+	
+	public void freeFromJail () {
+		position = Board.POS_JAIL;
+		inJail = false;
+		return;
+	}
+	
+	public boolean isInJail () {
+		return inJail;
+	}
+
+	public void failedJailExitAttempt () {
+		numJailExitAttempts++;
+		return;
+	}
+	
+	public boolean exceededJailExitAttempts () {
+		return numJailExitAttempts >= MAX_NUM_JAIL_EXIT_ATTEMPTS;
+	}
+	
+	public void addCard (Card card) {
+		cards.add(card);
+		return;
+	}
+	
+	public boolean hasGetOutOfJailCard () {
+		boolean hasCard = false;
+		if (cards.size()> 0) {
+			hasCard = cards.get(0).getAction() == CardDeck.ACT_GET_OUT_OF_JAIL;
+		}
+		return hasCard;
+	}
+	
+	public Card getCard () {
+		Card card = cards.get(0);
+		cards.remove(0);
+		return card;
+	}
+
 //  METHODS DEALING WITH MONEY
 	
 	public void doTransaction (int amount) {
@@ -190,9 +177,7 @@ public class Player {
 		}
 		return ownsAll;
 	}
-	public boolean isInJail(){
-		return inJail;
-	}
+	
 	public int getNumStationsOwned () {
 		int numOwned = 0;
 		for (Property p : properties) {
@@ -213,6 +198,25 @@ public class Player {
 		return numOwned;
 	}
 	
+	public int getNumHousesOwned () {
+		int numHousesOwned = 0;
+		for (Property p : properties) {
+			if (p instanceof Site) {
+				numHousesOwned = numHousesOwned + ((Site) p).getNumHouses();
+			}
+		}
+		return numHousesOwned;
+	}
+	
+	public int getNumHotelsOwned () {
+		int numHotelsOwned = 0;
+		for (Property p : properties) {
+			if (p instanceof Site) {
+				numHotelsOwned = numHotelsOwned + ((Site) p).getNumHotels();
+			}
+		}
+		return numHotelsOwned;
+	}	
 	
 // COMMON JAVA METHODS	
 	
@@ -223,14 +227,6 @@ public class Player {
 	public String toString () {
 		return name + " (" + tokenName + ")";
 	}
-
-	public boolean hasGetOutOfJailCard() { 
-		return hasGetOutOfJailCard;
-	}
-	
-	
-
-	
 	
 
 }

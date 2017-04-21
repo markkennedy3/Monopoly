@@ -1,16 +1,16 @@
 
 public class Tax extends Square {
-
-	boolean onTax;
-	int posFromJail;
 	
-	Tax(String name, int price) {
+	int amount;
+	
+	Tax (String name, int amount) {
 		super(name);
-		// TODO Auto-generated constructor stub
-		onTax = false;
-		posFromJail = 0;
-		
+		this.amount = amount;
+		return;
 	}
 
+	public int getAmount () {
+		return amount;
+	}
 	
 }

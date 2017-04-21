@@ -2,7 +2,8 @@
 public class Main {
 
 	public static void main (String args[]) {	
-		Monopoly monopoly = new Monopoly();		
+		
+		Monopoly monopoly = new Monopoly(args);		
 		monopoly.inputNames();
 		monopoly.giveStartMoney();
 		monopoly.decideStarter();

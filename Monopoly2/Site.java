@@ -57,6 +57,26 @@ public class Site extends Property {
 	public boolean hasBuildings () {
 		return numBuildings > 0;
 	}
+	
+	public int getNumHouses () {
+		int numHouses;
+		if (numBuildings < 5) {
+			numHouses = numBuildings;
+		} else {
+			numHouses = 0;
+		}
+		return numHouses;
+	}
+	
+	public int getNumHotels () {
+		int numHotels;
+		if (numBuildings == 5) {
+			numHotels = 1;
+		} else {
+			numHotels = 0;
+		}
+		return numHotels;
+	}
 
 // METHODS DEALING WITH COLOUR GROUPS
 	

@@ -1,47 +1,87 @@
 import java.util.ArrayList;
-
-
+import java.lang.reflect.*;
 
 public class Monopoly {
 
+	public static final int NUM_PLAYERS = 2;
+	
 	private static final int START_MONEY = 1500;
 	private static final int GO_MONEY = 200;
-	private static int randomNumber;
+	private static final int JAIL_FINE = 50;
+	
 	private Players players = new Players();
-	public Player currPlayer;
+	private Player currPlayer;
 	private Dice dice = new Dice();
 	private Board board = new Board(dice);
-	private UI ui = new UI(players, board);
+	private UI ui;
+	private ChanceDeck chanceDeck = new ChanceDeck();
+	private CommunityChestDeck communityChestDeck = new CommunityChestDeck();
 	private boolean gameOver = false;
 	private boolean onlyOneNotBankrupt = false;
 	private boolean turnFinished;
 	private boolean rollDone;
-	private boolean rentOwed;
-	private boolean rentPaid;
+	private int doubleCount;
+	private Bot[] bots = new Bot[NUM_PLAYERS];
+	private static final String[] BOT_NAMES = {"YourTeamName"};
 	
-	Monopoly () {
+	Monopoly (String[] args) {
+		setupBots(args);
+		ui = new UI(players, board, bots);
 		ui.display();
 		return;
 	}
 		
+	private void setupBots (String[] args) {
+		String[] botNames = new String [NUM_PLAYERS];
+		if (args.length<NUM_PLAYERS) {
+			botNames[0] = "Test1";
+			botNames[1] = "Test2";
+		} else {
+			for (int i=0; i<NUM_PLAYERS; i++) {
+				boolean found = false;
+				for (int j=0; (j<BOT_NAMES.length) && !found; j++) {
+					if (args[i].equals(BOT_NAMES[j])) {
+						found = true;
+						botNames[i] = args[i];
+					}
+				}
+				if (!found) {
+					System.out.println("Error: Bot name not found");
+					System.exit(-1);
+				}
+			}
+		}
+		for (int i=0; i<NUM_PLAYERS; i++) {
+			players.add(new Player(botNames[i],BoardPanel.TOKEN_NAME[i],i));
+			try {
+				Class<?> botClass = Class.forName(botNames[i]);
+				Constructor<?> botCons = botClass.getDeclaredConstructor(BoardAPI.class, PlayerAPI.class, DiceAPI.class);
+				bots[i] = (Bot) botCons.newInstance(board,players.get(i),dice);
+			} catch (IllegalAccessException ex) {
+				System.out.println("Error: Bot instantiation fail (IAE)");
+			    Thread.currentThread().interrupt();
+			} catch (InstantiationException ex) {
+				System.out.println("Error: Bot instantiation fail (IE)");
+			    Thread.currentThread().interrupt();
+			} catch (ClassNotFoundException ex) {
+				System.out.println("Error: Bot instantiation fail (CNFE)");
+			    Thread.currentThread().interrupt();
+			} catch (InvocationTargetException ex) {
+				System.out.println("Error: Bot instantiation fail (ITE)");
+			    Thread.currentThread().interrupt();
+			} catch (NoSuchMethodException ex) {
+				System.out.println("Error: Bot instantiation fail (NSME)");
+			    Thread.currentThread().interrupt();
+			}			
+		}
+		return;
+	}
+	
 	public void inputNames () {
 		int playerId = 0;
 		do {
 			ui.inputName(playerId);
-			if (!ui.isDone()) {
-				boolean duplicate = false;
-				for (Player p : players.get()) {
-					if (ui.getString().toLowerCase().equals(p.getName().toLowerCase())) {
-						duplicate = true;
-					}
-				}
-				if (!duplicate) {
-					players.add(new Player(ui.getString(),ui.getTokenName(playerId),playerId));
-					playerId++;
-				} else {
-					ui.displayError(UI.ERR_DUPLICATE);
-				}
-			}
+			playerId++;
 		} while (!ui.isDone() && players.canAddPlayer());
 		return;
 	}
@@ -84,186 +124,155 @@ public class Monopoly {
 		return;
 	}
 	
-	private void processRoll () {
-		if((currPlayer.getBalance() < 0)){ //if balance is negative you cant roll//
-			ui.displayError(UI.ERR_NEG_BALANCE);
-			
-		}
-		if(currPlayer.isInJail() == true && rollDone == true){ 
-			ui.displayError(UI.ERR_TOO_MANY_ROLLS);
-		}
-		if(currPlayer.isInJail() == true){ //if player in jail
-			dice.roll();
-			ui.displayDice(currPlayer, dice);
-			if(dice.isDouble()){ //if dice is double
-				currPlayer.move(dice.getTotal());
-				ui.displayGetOutOfJail(currPlayer);
-				ui.displaySquare(currPlayer, board, dice);
-				ui.display();
-				rollDone = false;
-				currPlayer.inJail = false; //player gets out of jail
-				if(!rentOwed){ //normal moving functionality
-					if (board.getSquare(currPlayer.getPosition()) instanceof Property && 
-							((Property) board.getSquare(currPlayer.getPosition())).isOwned() &&
-							!((Property) board.getSquare(currPlayer.getPosition())).getOwner().equals(currPlayer) ) {
-								rentOwed = true;
-								rentPaid = false;
-					} else {
-						rentOwed = false;
-					}
-					
-				
-				}
-				if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
-					Property property = (Property) board.getSquare(currPlayer.getPosition());
-					if (property.isOwned()) {
-						if (!property.getOwner().equals(currPlayer)) {
-							if (!rentPaid) {
-								    int rent = property.getRent();
-									Player owner = property.getOwner();
-									currPlayer.doTransaction(-rent);
-									owner.doTransaction(+rent);
-									ui.displayTransaction(currPlayer, owner);
-									rentPaid = true;	
-									rentOwed = false;
-								
-							} 
-						} 
-					} 
-				} 
-			}
-			else{ //if player doesnt roll double
-				currPlayer.numOfStrikes += 1;
-				ui.displayNotGetOutOfJail(currPlayer);//Different display for not getting out of jail
-				rollDone = true;
-				if(currPlayer.numOfStrikes == 3){//if the player has not rolled a double in 3 turns
-					currPlayer.move(dice.getTotal());
-					
-					int fine = currPlayer.getFine(); //pay fine method
-					currPlayer.payFine(-fine);
-					ui.displayFine(currPlayer);
-					currPlayer.inJail = false;
-					ui.displaySquare(currPlayer, board, dice);
-					ui.display();
-					
-				}
-			}
-		}else{
-		if (rollDone == false) { //if player still has roll
-			if (!rentOwed) {
-				dice.roll();
-				ui.displayDice(currPlayer, dice);
-				//currPlayer.move(30); //jail test
-				currPlayer.move(dice.getTotal());
-				ui.display();
-				
-				if (currPlayer.passedGo()) {
-					currPlayer.doTransaction(+GO_MONEY);
-					ui.displayPassedGo(currPlayer);
-					ui.displayBankTransaction(currPlayer);
-				}
-				ui.displaySquare(currPlayer, board, dice);
-				
-				
-				if (board.getSquare(currPlayer.getPosition()) instanceof Property && 
-						((Property) board.getSquare(currPlayer.getPosition())).isOwned() &&
-						!((Property) board.getSquare(currPlayer.getPosition())).getOwner().equals(currPlayer) ) {
-							rentOwed = true;
-							rentPaid = false;
-				} else {
-					rentOwed = false;
-				}
-				if (!dice.isDouble()) {
-					rollDone = true;
-				}
-			} else {
-				ui.displayError(UI.ERR_RENT_OWED);	
-			}
-		} else {
-			ui.displayError(UI.ERR_DOUBLE_ROLL);
-			currPlayer.numOfDoubles += 1;
-		}
-		}
-		
-		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
-			Property property = (Property) board.getSquare(currPlayer.getPosition());
-			if (property.isOwned()) {
-				if (!property.getOwner().equals(currPlayer)) {
-					if (!rentPaid) {
-						    int rent = property.getRent();
-							Player owner = property.getOwner();
-							currPlayer.doTransaction(-rent);
-							owner.doTransaction(+rent);
-							ui.displayTransaction(currPlayer, owner);
-							rentPaid = true;	
-							rentOwed = false;
-						
-					} else {
-						ui.displayError(UI.ERR_RENT_ALREADY_PAID);									
-					}
-				} else {
-					ui.displayError(UI.ERR_SELF_OWNED);								
-				}
-			} 
-		} 
-	
-		
-	
-		if(currPlayer.getPosition() == 4 || currPlayer.getPosition() == 38){ //checks if player position on square then takes from balance
-			processPayTax();
-		}
-	
-		
-		if(currPlayer.getPosition() == 2 || currPlayer.getPosition() == 17 || currPlayer.getPosition() == 33){ //checks if player position on square then plays card
-			if(!dice.isDouble()){
-			CommunityChest(currPlayer);
-			ui.displayLandedOnCommunityChest(currPlayer);
-			rollDone=true;
-			}
-			else{
-				rollDone=false;
-			}
-			
-			turnFinished = false;
-     	}
-		
-		
-	
-		if(currPlayer.getPosition() == 7 || currPlayer.getPosition() == 22 || currPlayer.getPosition() == 36){ //checks if player position on square then plays card
-			if(!dice.isDouble()){
-            Chance(currPlayer);
-			ui.displayLandedOnChance(currPlayer);
-			rollDone=true;
-			}
-			else{
-				rollDone=false;
-			}
-			
-			turnFinished = false;
-		}
-		
-		
-		if(currPlayer.numOfDoubles == 3){//If there are 3 doubles in a row
-     		int positionFromJail = currPlayer.getPositionsFromJail();
-			currPlayer.moveToJail(positionFromJail);
-			currPlayer.inJail = true;
-			rollDone = true;
-		}
-		
-		if(board.getSquare(currPlayer.getPosition()) instanceof Square){
-		if(currPlayer.getPosition() == 30){//if the person is on go to jail
-			int positionFromJail = currPlayer.getPositionsFromJail();
-			currPlayer.moveToJail(positionFromJail);
-			ui.displayMovedToJail(currPlayer);
-			currPlayer.inJail = true;
-			rollDone = true;
-			}
+	private void checkPassedGo () {
+		if (currPlayer.passedGo()) {
+			currPlayer.doTransaction(+GO_MONEY);
+			ui.displayPassedGo(currPlayer);
+			ui.displayBankTransaction(currPlayer);
 		}
 		return;
 	}
 	
-
-	private void processBuy () {
+	private void cardAction (Card card) {
+		switch (card.getAction()) {
+			case CardDeck.ACT_GO_FORWARD :
+				currPlayer.moveTo(card.getDestination());
+				ui.display();
+				checkPassedGo();
+				squareArrival();
+				break;
+			case CardDeck.ACT_GO_BACKWARD:
+				currPlayer.moveTo(card.getDestination());
+				ui.display();
+				squareArrival();
+				break;						
+			case CardDeck.ACT_MOVE :
+				currPlayer.move(card.getNumSpaces());
+				ui.display();
+				squareArrival();
+				break;
+			case CardDeck.ACT_GOTO_JAIL :
+				currPlayer.goToJail();
+				ui.display();
+				rollDone = true;
+				break;
+			case CardDeck.ACT_GET_OUT_OF_JAIL:
+				currPlayer.addCard(card);
+				break;
+			case CardDeck.ACT_PAY_HOUSES :
+				int amount = currPlayer.getNumHousesOwned() * card.getHouseCost() + currPlayer.getNumHotelsOwned() * card.getHotelCost();
+				currPlayer.doTransaction(-amount);				
+				ui.displayBankTransaction(currPlayer);
+				break;
+			case CardDeck.ACT_PAY :
+				currPlayer.doTransaction(-card.getAmount());
+				ui.displayBankTransaction(currPlayer);
+				break;
+			case CardDeck.ACT_RECEIVE :
+				currPlayer.doTransaction(+card.getAmount());
+				ui.displayBankTransaction(currPlayer);
+				break;
+			case CardDeck.ACT_PAY_OR_CHANCE :
+				ui.inputPayOrChance(currPlayer);
+				if (ui.inputWasPay()) {
+					currPlayer.doTransaction(-card.getAmount());
+					ui.displayBankTransaction(currPlayer);
+				} else {
+					Card secondCard = chanceDeck.get();
+					ui.displayCard(secondCard);
+					cardAction(secondCard);
+					chanceDeck.add(secondCard);
+				}
+				break;
+			case CardDeck.ACT_GIFTS :
+				for (Player otherPlayer : players.getOtherPlayers(currPlayer)) {
+					currPlayer.doTransaction(+card.getAmount());
+					otherPlayer.doTransaction(-card.getAmount());
+					ui.displayTransaction(otherPlayer, currPlayer);
+				}
+				break;
+		}	
+		return;
+	}
+	
+	private void squareArrival () {
+		ui.displaySquare(currPlayer);
+		Square square = board.getSquare(currPlayer.getPosition());
+		if (square instanceof Property && ((Property) square).isOwned() && !((Property) square).getOwner().equals(currPlayer) ) {
+			int rent = ((Property) square).getRent();
+			Player owner = ((Property) square).getOwner();
+			currPlayer.doTransaction(-rent);
+			owner.doTransaction(+rent);
+			ui.displayTransaction(currPlayer, owner);
+		} else if (square instanceof Chance) {
+			Card card = chanceDeck.get();
+			ui.displayCard(card);
+			cardAction(card);
+			chanceDeck.add(card);			
+		} else if (square instanceof CommunityChest) {
+			Card card = communityChestDeck.get();
+			ui.displayCard(card);
+			cardAction(card);
+			communityChestDeck.add(card);
+		} else if (square instanceof Tax) {
+			int amount = ((Tax) square).getAmount();
+			currPlayer.doTransaction(-amount);					
+			ui.displayBankTransaction(currPlayer);
+		} else if (square instanceof GoToJail) {
+			currPlayer.goToJail();
+			rollDone = true;
+		}
+		ui.display();
+		return;
+	}
+	
+	private void rollCommand () {
+		if (!rollDone) {
+			if (currPlayer.getBalance() >= 0) {
+				dice.roll();
+				ui.displayDice(currPlayer, dice);
+				if (!currPlayer.isInJail()) {
+					currPlayer.move(dice.getTotal());
+					ui.display();
+					checkPassedGo();
+					squareArrival();
+					if (dice.isDouble()) {
+						doubleCount++;
+						if (doubleCount == 3) {
+							ui.displayThreeDoubles(currPlayer);
+							currPlayer.goToJail();
+							rollDone = true;
+						}
+					} else {
+						rollDone = true;
+					}
+				} else {
+					if (dice.isDouble()) {
+						currPlayer.freeFromJail();
+						ui.displayFreeFromJail(currPlayer);
+					} else {
+						currPlayer.failedJailExitAttempt();
+						if (currPlayer.exceededJailExitAttempts()) {
+							currPlayer.doTransaction(-JAIL_FINE);
+							ui.displayJailFine(currPlayer,JAIL_FINE);							
+							currPlayer.freeFromJail();
+							ui.displayFreeFromJail(currPlayer);
+						}
+					}
+					currPlayer.move(dice.getTotal());
+					ui.display();
+					rollDone = true;
+				}
+			} else {
+				ui.displayError(UI.ERR_NEGATIVE_BALANCE);	
+			}
+		} else {
+			ui.displayError(UI.ERR_DOUBLE_ROLL);
+		}
+		return;
+	}
+	
+	private void buyCommand () {
 		if (board.getSquare(currPlayer.getPosition()) instanceof Property) {
 			Property property = (Property) board.getSquare(currPlayer.getPosition());
 			if (!property.isOwned()) {
@@ -284,34 +293,7 @@ public class Monopoly {
 		return;
 	}
 	
-	
-	
-	private void processPayTax(){  
-		if (currPlayer.getPosition() ==  4) {
-						if (currPlayer.getBalance()>= 150) { //checks if player has enough for balance
-							currPlayer.doTransaction(-150); //does transaction
-							ui.displayBankTransaction(currPlayer);
-							ui.displayString(currPlayer+" paid Income Tax");
-							rollDone = true;
-						}	
-						else{
-							ui.displayError(UI.ERR_INSUFFICIENT_FUNDS); //err message
-						}
-			}
-		if (currPlayer.getPosition() ==  38) {
-			if (currPlayer.getBalance()>= 100) {
-				currPlayer.doTransaction(-100);
-				ui.displayBankTransaction(currPlayer);
-				ui.displayString(currPlayer+" paid Super Tax");
-				rollDone = true;
-			}	
-			else{
-				ui.displayError(UI.ERR_INSUFFICIENT_FUNDS);
-			}
-}
-	}		
-	
-	private void processBuild () {
+	private void buildCommand () {
 		Property property = ui.getInputProperty();
 		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
 			if (property instanceof Site) {
@@ -350,7 +332,7 @@ public class Monopoly {
 		return;
 	}
 	
-	private void processDemolish () {
+	private void demolishCommand () {
 		Property property = ui.getInputProperty();
 		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
 			if (property instanceof Site) {
@@ -377,8 +359,7 @@ public class Monopoly {
 		return;		
 	}
 	
-	
-	public void processBankrupt () {
+	private void bankruptCommand () {
 		ui.displayBankrupt(currPlayer);
 		Player tempPlayer = players.getNextPlayer(currPlayer);
 		players.remove(currPlayer);
@@ -391,19 +372,7 @@ public class Monopoly {
 		return;
 	}
 	
-public void processPayFromJail(){ 
-	if (currPlayer.isInJail() == true){ //checks if in jail
-		int fine = currPlayer.getFine();
-		currPlayer.payFine(-fine); //takes fine
-		ui.displayFine(currPlayer);
-		currPlayer.inJail = false; //player no longer in jail
-	}else{
-		ui.displayError(UI.ERR_NOT_IN_JAIL);
-	}
-	
-}
-		
-	public void processMortgage () {
+	private void mortgageCommand () {
 		Property property = ui.getInputProperty();
 		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
 			if ((property instanceof Site) && !((Site) property).hasBuildings() || (property instanceof Station) || (property instanceof Utility)) {
@@ -423,7 +392,44 @@ public void processPayFromJail(){
 		return;		
 	}
 	
-	public void processRedeem () {
+	private void cardCommand () {
+		if (currPlayer.isInJail()) {
+			if (currPlayer.hasGetOutOfJailCard()) {
+				Card card = currPlayer.getCard();
+				if (card.getType() == ChanceDeck.CHANCE_CARD) {
+					chanceDeck.add(card);
+				} else {
+					communityChestDeck.add(card);
+				}
+				currPlayer.freeFromJail();
+				ui.displayFreeFromJail(currPlayer);
+			} else {
+				ui.displayError(UI.ERR_DOES_NOT_HAVE_GET_OUT_OF_JAIL_CARD);
+			}
+		} else {
+			ui.displayError(UI.ERR_NOT_IN_JAIL);
+		}
+		return;
+	}
+	
+	private void payCommand () {
+		if (currPlayer.isInJail()) {
+			if (currPlayer.getBalance() >= JAIL_FINE) {
+				currPlayer.doTransaction(-JAIL_FINE);
+				currPlayer.freeFromJail();
+				ui.displayBankTransaction(currPlayer);
+				ui.displayFreeFromJail(currPlayer);
+				ui.display();
+			} else {
+				ui.displayError(UI.ERR_DOES_NOT_HAVE_GET_OUT_OF_JAIL_CARD);
+			}
+		} else {
+			ui.displayError(UI.ERR_NOT_IN_JAIL);
+		}
+		return;
+	}
+	
+	private void redeemCommand () {
 		Property property = ui.getInputProperty();
 		if (property.isOwned() && property.getOwner().equals(currPlayer)) {
 			if (property.isMortgaged()) {
@@ -443,16 +449,13 @@ public void processPayFromJail(){
 		}
 		return;			
 	}
-
-	private void processDone () {
+	
+	private void doneCommand () {
 		if (rollDone) {
-			if (!rentOwed || (rentOwed && rentPaid)) {
-				turnFinished = true;
+			if (currPlayer.getBalance() >= 0) {
+				turnFinished = true;								
 			} else {
-				ui.displayError(UI.ERR_RENT_OWED);
-			}
-			if(currPlayer.getBalance() < 0){
-				ui.displayError(UI.ERR_NEG_BALANCE);
+				ui.displayError(UI.ERR_NEGATIVE_BALANCE);
 			}
 		} else {
 			ui.displayError(UI.ERR_NO_ROLL);
@@ -463,16 +466,15 @@ public void processPayFromJail(){
 	public void processTurn () {
 		turnFinished = false;
 		rollDone = false;
-		rentOwed = false;
-		rentPaid = false;
+		doubleCount = 0;
 		do {
 			ui.inputCommand(currPlayer);
 			switch (ui.getCommandId()) {
 				case UI.CMD_ROLL :
-					processRoll();
+					rollCommand();
 					break;
 				case UI.CMD_BUY :
-					processBuy();
+					buyCommand();
 					break;
 				case UI.CMD_BALANCE :
 					ui.displayBalance(currPlayer);
@@ -481,68 +483,42 @@ public void processPayFromJail(){
 					ui.displayProperty(currPlayer);
 					break;
 				case UI.CMD_BANKRUPT :
-					processBankrupt();
+					bankruptCommand();
 					turnFinished = true;
 					break;
 				case UI.CMD_BUILD :
-					processBuild();
+					buildCommand();
 					break;
 				case UI.CMD_DEMOLISH :
-					processDemolish();
-					break;
-				case UI.CMD_REDEEM :
-					processRedeem();
+					demolishCommand();
 					break;
 				case UI.CMD_MORTGAGE :
-					processMortgage();
+					mortgageCommand();
+					break;
+				case UI.CMD_REDEEM :
+					redeemCommand();
+					break;
+				case UI.CMD_CARD :
+					cardCommand();
+					break;
+				case UI.CMD_PAY:
+					payCommand();
 					break;
 				case UI.CMD_HELP :
 					ui.displayCommandHelp();
 					break;
 				case UI.CMD_DONE :
-					processDone();
+					doneCommand();
 					break;
-				case UI.CMD_PAY_10 : 			//additional processes below
-					processPayDebt();
-					turnFinished = false;
+				case UI.CMD_QUIT : 
+					turnFinished = true;
+					gameOver = true;
 					break;
-				case UI.CMD_TAKE_CHANCE : 
-					processTakeChance();
-					turnFinished = false; 
-					break;
-				case UI.CMD_PAY_FINE :
-					processPayFromJail();
-					break;
-				case UI.CMD_USE_CARD :
-					processUseCard();
-					break;
-					
-					
-			}
-			if(board.getSquare(currPlayer.getPosition()) instanceof Property){
-				Property property = (Property) board.getSquare(currPlayer.getPosition());
-				if(property.isGoToJail()){
-					//currPlayer.
-				}
-				
 			}
 		} while (!turnFinished);
 		return;
 	}
 	
-	
-	
-	private void processUseCard() { //use card functionality
-		if(currPlayer.hasGetOutOfJailCard() == true && currPlayer.isInJail() == true){
-			currPlayer.inJail = false;
-		}
-		else{
-			ui.displayError(UI.ERR_NO_CARD);
-		}
-		}
-		
-	
-
 	public void nextPlayer () {
 		currPlayer = players.getNextPlayer(currPlayer);
 		return;
@@ -571,335 +547,6 @@ public void processPayFromJail(){
 		}
 		return;
 	}
-	
-	
-	
-	//All Of Cards//
-	
-	public void CommunityChest(Player currPlayer) 
-
-	{
-		randomNumber =  (int)(Math.random()*16+1);//Randomizes number out of 16
-
-	    switch(randomNumber) 
-	    
-	    {
-	    
-	    //each statement
-	    
-	    case 1 :
-	    	//Advance to Go//
-	    	//just needs linked in right//
-	    	ui.displayString(currPlayer+" must advance to go");
-	    	currPlayer.moveToGo();
-	    	ui.displayMovedToGo(currPlayer);
-	    	
-	    	break;
-	    
-	    case 2 :
-	    	//Go Back to UCD Bike Shop//
-	    	ui.displayString(currPlayer+" has to move to ucd bikeshop");
-	    	currPlayer.moveToBikeShop();
-	    	ui.displayMovedToBikeShop(currPlayer);
-	    	
-	    	break;
-	    	
-	    case 3 :
-	    	//Go To Jail//
-	    	
-	    	int positionFromJail = currPlayer.getPositionsFromJail();
-			currPlayer.moveToJail(positionFromJail);//Moves the token positionFromJail spaces
-			ui.displayString(currPlayer + " must go to jail ");
-			currPlayer.inJail = true;//Player is now in jail
-	    	
-	    	break;
-	    
-	    case 4 :
-	    	//Pay 100 to hospital//
-	    	currPlayer.doTransaction(-100);
-	    	ui.displayString(currPlayer+" visited the hospital");
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    	
-	    case 5 :
-	    	//Pay 50 to doctor//
-	    	currPlayer.doTransaction(-50);
-	    	ui.displayString(currPlayer+" visited the doctor");
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    
-	    case 6 :
-	    	//Pay 50 insureance
-	    	currPlayer.doTransaction(-50);
-	    	ui.displayString(currPlayer+" has to pay for insurance");
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    	
-	    case 7 :
-	    	//Bank error +200
-	    	currPlayer.doTransaction(+200);
-	    	ui.displayString(currPlayer+" has profited from a bank error");
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    
-	    case 8 :
-	    	//Annuity matures + 100
-	    	currPlayer.doTransaction(+100);
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    	
-	    case 9 :
-	    	//Inherit 100
-	    	currPlayer.doTransaction(+100);
-	    	ui.displayString(currPlayer+" has inherited 100 euro");
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    
-	    case 10 :
-	    	//stock sale +50
-	    	currPlayer.doTransaction(+50);
-	    	ui.displayString(currPlayer+" has sold some stock");
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    	
-	    case 11 :
-	    	//shares +25
-	    	currPlayer.doTransaction(+25);
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    
-	    case 12 :
-	    	//income tax refund +20
-	    	currPlayer.doTransaction(+20);
-	    	ui.displayString(currPlayer+" got a tax refund of 20 euro");
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    	
-	    case 13 :
-	    	//beauty contest +10
-	    	currPlayer.doTransaction(+10);
-	    	ui.displayString(currPlayer+" won a beauty contest");
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    
-	    case 14 :
-	    	//birthday 10 from each player
-	    	ui.displayString("Happy Birthday "+currPlayer+" collect 10 euro from each player");
-	    	for (Player p : players.get()) {
-	    		if( p != currPlayer){
-	    		currPlayer.doTransaction(+10);
-	    		currPlayer.doTransaction(-10);
-	    		ui.displayTransaction(currPlayer, p);
-	    		}
-	    		else{
-	    			return;
-	    		}
-			}
-	    	break;
-	    	
-	    case 15 :
-	    	//get out of jail free
-	    	currPlayer.hasGetOutOfJailCard = true;
-	    	break;
-	    
-	    case 16 :
-	    	//pay 10 or take chance
-	    	ui.displayString("Pay 10 or Take Chance");
-	    	
-	    	break;
-	    	
-	    default :
-	        System.out.println("Invalid output");
-	  }
-	  return;
-	}
-
-
-	public void Chance(Player currPlayer) 
-
-	{
-		randomNumber =  (int)(Math.random()*16+1);
-
-	    switch(randomNumber) 
-	    
-	    {
-	    
-	    
-	    case 1 :
-	    	//Advance to Go//
-	    	//just needs linked in right//
-	    	ui.displayString(currPlayer+" must advance to go");
-	    	currPlayer.moveToGo();
-	    	ui.displayMovedToGo(currPlayer);
-	    	break;
-	    
-	    case 2 :
-	    	//Go to jail//
-	    	int positionFromJail = currPlayer.getPositionsFromJail();
-			currPlayer.moveToJail(positionFromJail);//Moves the token positionFromJail spaces
-			ui.displayString(currPlayer + " must go to jail ");
-			currPlayer.inJail = true;//Player is now in jail
-	    	
-	    	
-	    	break;
-	    	
-	    case 3 :
-	    	//Go To pal mall(belgrove) if you pass go collect 200//
-	    	
-	    	
-	    	if(currPlayer.getPosition() > 11){
-	    		currPlayer.doTransaction(+200);
-	    		currPlayer.moveToBelgrove();
-	    		ui.displayString(currPlayer+" has been moved to Belgrove and has passed go and" + currPlayer + "has collected 200 euro");
-	    	}
-	    	else if(currPlayer.getPosition() < 11){
-	    		currPlayer.moveToBelgrove();
-	    		ui.displayString(currPlayer+" has been moved to Belgrove");
-	    	}
-	    	else if(currPlayer.getPosition() == 11){
-	    		
-	    	}
-	    	
-	    	
-	    	
-	    	break;
-	    
-	    case 4 :
-	    	//Take a trip to Marylebone Station(drumcondra) and if you pass Go collect £200.//
-	    	if(currPlayer.getPosition() > 15){
-	    		currPlayer.doTransaction(+200);
-	    		currPlayer.moveToDrumcondra();
-	    		ui.displayString(currPlayer+" has been moved to Drumcondra and has passed go and" + currPlayer + "has collected 200 euro");
-	    	}
-	    	else if(currPlayer.getPosition() < 15){
-	    		currPlayer.moveToDrumcondra();
-	    	}
-	    	else if(currPlayer.moveToDrumcondra() == 15){
-	    		
-	    	}
-	    	break;
-	    	
-	    case 5 :
-	    	//Advance to Trafalgar Square(student bar). If you pass Go collect £200.//
-	    	if(currPlayer.getPosition() > 24){
-	    		currPlayer.doTransaction(+200);
-	    		currPlayer.moveToClubhouse();
-	    		ui.displayString(currPlayer+" has been moved to the Clubhouse and has passed go and" + currPlayer + "has collected 200 euro");
-	    	}
-	    	else if(currPlayer.getPosition() < 24){
-	    		currPlayer.moveToClubhouse();
-	    	}
-	    	else if(currPlayer.getPosition() == 24){
-	    		
-	    	}
-	    	break;
-	    
-	    case 6 :
-	    	//Advance to Mayfair(sutherland)
-	    	if(currPlayer.getPosition() > 39){
-	    		currPlayer.doTransaction(+200);
-	    		currPlayer.moveToLaw();
-	    		ui.displayString(currPlayer+" has been moved to Sutherland and has passed go and" + currPlayer + "has collected 200 euro");
-	    	}
-	    	else if(currPlayer.getPosition() < 24){
-	    		currPlayer.moveToLaw();
-	    	}
-	    	else if(currPlayer.getPosition() == 24){
-	    		
-	    	}
-	    	break;
-	    	
-	    case 7 :
-	    	//go back 3 spaces
-	    	currPlayer.move(-3);
-	    	break;
-	    
-	    case 8 :
-	    	//Make general repairs on all of your houses. For each house pay £25. For each hotel pay £100.
-	    	break;
-	    	
-	    case 9 :
-	    	//You are assessed for street repairs: £40 per house, £115 per hotel.
-	    	break;
-	    
-	    case 10 :
-	    	//Pay school fees of £150
-	    	currPlayer.doTransaction(-150);
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    	
-	    case 11 :
-	    	//Drunk in charge fine £20.
-	    	currPlayer.doTransaction(-20);
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    
-	    case 12 :
-	    	//Speeding fine £15.
-	    	currPlayer.doTransaction(-15);
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    	
-	    case 13 :
-	    	//Your building loan matures. Receive £150.
-	    	currPlayer.doTransaction(+150);
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    
-	    case 14 :
-	    	//You have won a crossword competition. Collect £100.
-	    	currPlayer.doTransaction(+100);
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    	
-	    case 15 :
-	    	//Bank pays you dividend of £50.
-	    	currPlayer.doTransaction(+50);
-	    	ui.displayBankTransaction(currPlayer);
-	    	break;
-	    
-	    case 16 :
-	    	//Get out of jail free. This card may be kept until needed or sold.
-	    	currPlayer.hasGetOutOfJailCard = true;
-	    	break;
-	    	
-	    default :
-	        System.out.println("Invalid output");
-	  }
-	  return;
-	}
-	
-	
-	
-	
-	
-	
-	public void processPayDebt () {
-		currPlayer.doTransaction(-10);
-		ui.displayBankTransaction(currPlayer);
-		turnFinished = false;
-	}
-	
-	public void processTakeChance () {
-		Chance(currPlayer);
-		turnFinished = false;
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	public void displayGameOver () {
 		ui.displayGameOver ();

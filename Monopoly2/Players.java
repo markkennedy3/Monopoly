@@ -27,6 +27,12 @@ public class Players {
 		return players;
 	}
 	
+	public ArrayList<Player> getOtherPlayers (Player player) {
+		ArrayList<Player> otherPlayers = new ArrayList<Player>(players);
+		otherPlayers.remove(player);
+		return otherPlayers;
+	}
+	
 	public void clear () {
 		players.clear();
 		return;

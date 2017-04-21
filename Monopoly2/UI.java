@@ -8,70 +8,57 @@ public class UI {
 
 	private static final int FRAME_WIDTH = 1200;
 	private static final int FRAME_HEIGHT = 800;
-	private static final String CURRENCY = " Euros";
+
+	public static final String CURRENCY = " pounds";
+	public static final String CURRENCY_SYMBOL = "£";
 	
 	public static final int CMD_QUIT = 0;
 	public static final int CMD_DONE = 1;
 	public static final int CMD_ROLL = 2;
 	public static final int CMD_BUY = 3;
-	public static final int CMD_PAY_RENT = 4;
-	public static final int CMD_AUCTION = 5;
-	public static final int CMD_PROPERTY = 6;
-	public static final int CMD_BALANCE = 7;
-	public static final int CMD_BANKRUPT = 8;
-	public static final int CMD_HELP = 9;
-	public static final int CMD_OFFER = 10;
-	public static final int CMD_MORTGAGE = 11;
-	public static final int CMD_BUILD = 12;
-	public static final int CMD_SELL = 14;
-	public static final int CMD_REDEEM = 15;
-	public static final int CMD_DEMOLISH = 16;
-	public static final int CMD_PAY_10 = 17; //additional commands//
-	public static final int CMD_TAKE_CHANCE = 18;
-	public static final int CMD_PAY_FINE = 19;
-	public static final int CMD_USE_CARD = 20;
-	
-	
+	public static final int CMD_AUCTION = 4;
+	public static final int CMD_PROPERTY = 5;
+	public static final int CMD_BALANCE = 6;
+	public static final int CMD_BANKRUPT = 7;
+	public static final int CMD_HELP = 8;
+	public static final int CMD_MORTGAGE = 9;
+	public static final int CMD_BUILD = 10;
+	public static final int CMD_SELL = 11;
+	public static final int CMD_REDEEM = 12;
+	public static final int CMD_CHEAT = 13;
+	public static final int CMD_DEMOLISH = 14;
+	public static final int CMD_CARD = 15;
+	public static final int CMD_PAY = 16;
 	
 	public static final int ERR_SYNTAX = 0;
 	public static final int ERR_DOUBLE_ROLL = 1;
 	public static final int ERR_NO_ROLL = 2;
 	public static final int ERR_INSUFFICIENT_FUNDS = 3;
-	public static final int ERR_NOT_A_PROPERTY = 4;
-	public static final int ERR_RENT_ALREADY_PAID = 5;
-	public static final int ERR_NOT_OWNED = 6;
-	public static final int ERR_IS_OWNED = 7;
-	public static final int ERR_SELF_OWNED = 8;
-	public static final int ERR_RENT_OWED= 9;
-	public static final int ERR_NOT_A_NAME = 10;
-	public static final int ERR_TOO_MANY_BUILDINGS = 11;
-	public static final int ERR_NOT_A_SITE = 12;
-	public static final int ERR_NOT_YOURS = 13;
-	public static final int ERR_TOO_FEW_BUILDINGS = 14;
-	public static final int ERR_DOES_NOT_HAVE_GROUP = 15;
-	public static final int ERR_DUPLICATE = 16;
-	public static final int ERR_HAS_BUILDINGS = 17;
-	public static final int ERR_IS_MORTGAGED = 18;
-	public static final int ERR_IS_NOT_MORTGAGED = 19;
-	public static final int SITE_IS_MORTGAGED = 20;
-	public static final int ERR_IN_JAIL = 21;
-	public static final int ERR_NEG_BALANCE = 22; //additional errors//
-	public static final int ERR_TOO_MANY_ROLLS = 23;
-	public static final int ERR_NOT_IN_JAIL = 24;
-	public static final int ERR_NO_CARD = 25;
-	
+	public static final int ERR_IS_OWNED = 4;
+	public static final int ERR_SELF_OWNED = 5;
+	public static final int ERR_NOT_A_NAME = 6;
+	public static final int ERR_TOO_MANY_BUILDINGS = 7;
+	public static final int ERR_NOT_A_SITE = 8;
+	public static final int ERR_NOT_YOURS = 9;
+	public static final int ERR_TOO_FEW_BUILDINGS = 10;
+	public static final int ERR_DOES_NOT_HAVE_GROUP = 11;
+	public static final int ERR_DUPLICATE = 12;
+	public static final int ERR_HAS_BUILDINGS = 13;
+	public static final int ERR_IS_MORTGAGED = 14;
+	public static final int ERR_IS_NOT_MORTGAGED = 15;
+	public static final int SITE_IS_MORTGAGED = 16;
+	public static final int ERR_NEGATIVE_BALANCE = 17;
+	public static final int ERR_NOT_A_PROPERTY = 18;
+	public static final int ERR_DOES_NOT_HAVE_GET_OUT_OF_JAIL_CARD = 19;
+	public static final int ERR_NOT_IN_JAIL = 20;
 	
 	private final String[] errorMessages = {
 		"Error: Not a valid command.",
 		"Error: Too many rolls this turn.",
 		"Error: You have a roll to play.",
 		"Error: You don't have enough money.",
-		"Error: This square is not a property.",
-		"Error: You have already paid the rent.",
-		"Error: The property is not owned.",
 		"Error: The property is already owned.",
 		"Error: You own the property.",
-		"Error: You owe rent.",
 		"Error: Not a name.",
 		"Error: Too many units.",
 		"Error: That property is not a site.",
@@ -83,12 +70,10 @@ public class UI {
 		"Error: The property has already been mortgaged.",
 		"Error: The property has not been mortgaged.",
 		"Error: The property has been mortgaged.",
-		"Error: You are in jail you cannot do this command",
-		"Error: Your balance is negative please mortgage/sell property to make balance positive",
-		"Error: Too Many Rolls",
-		"Error: You are not in jail",
-		"Error: You have no card"
-		
+		"Error: Cannot end a turn with a negative bank balance.",
+		"Error: You are not on a property.",
+		"Error: You do not have a get out of jail free card.",
+		"Error: You are not in jail."
 	};
 	
 	private JFrame frame = new JFrame();
@@ -103,13 +88,16 @@ public class UI {
 	private Property inputProperty;
 	private int inputNumber;
 	private Player inputPlayer;
+	private boolean inputWasPay;
+	private Bot[] bots;
 
-	UI (Players players, Board board) {
+	UI (Players players, Board board, Bot[] bots) {
 		this.players = players;
 		this.board = board;
+		this.bots = bots;
 		boardPanel = new BoardPanel(this.players);
 		frame.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-		frame.setTitle("MrPennybag's Monopoly");
+		frame.setTitle("Monopoly");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(boardPanel, BorderLayout.LINE_START);
 		frame.add(infoPanel, BorderLayout.LINE_END);
@@ -121,34 +109,20 @@ public class UI {
 
 //  METHODS DEALING WITH USER INPUT
 	
-	public void inputName (int numPlayers) {
-		boolean inputValid = false;
-		if (numPlayers == 0) {
-			infoPanel.displayString("Enter new player name (" + boardPanel.getTokenName(numPlayers) + "):");			
+	public void inputName (int numPlayer) {
+		if (numPlayer == 0) {
+			infoPanel.displayString("Enter new player name (" + boardPanel.getTokenName(numPlayer) + "):");			
 		} else {
-			infoPanel.displayString("Enter new player name (" + boardPanel.getTokenName(numPlayers)  +  ") or done:");
+			infoPanel.displayString("Enter new player name (" + boardPanel.getTokenName(numPlayer)  +  ") or done:");
 		}
-		do {
-			commandPanel.inputString();
-			string = commandPanel.getString();
-			string = string.trim();
-			if (string.length()==0) {
-				inputValid = false;
-				done = false;
-			} else if ( (numPlayers > 0) && (string.toLowerCase().equals("done")) ) {
-				inputValid = true;
-				done = true;
-			} else if (string.contains(" ")) {
-				inputValid = false;
-				done = false;
-			} else {
-				inputValid = true;
-			}
-			infoPanel.displayString("> " + string);
-			if (!inputValid) {
-				displayError(ERR_NOT_A_NAME);
-			}
-		} while (!inputValid);
+		if (numPlayer < Monopoly.NUM_PLAYERS) {
+			string = bots[numPlayer].getName();
+			done = false;
+		} else if (numPlayer == Monopoly.NUM_PLAYERS) {
+			string = "DONE";
+			done = true;
+		}
+		infoPanel.displayString("> " + string);
 		return;
 	}
 	
@@ -168,10 +142,8 @@ public class UI {
 		boolean inputValid = false;
 		do {
 			infoPanel.displayString(player + " type your command:");
-			commandPanel.inputString();
-			string = commandPanel.getString();
+			string = bots[player.getTokenId()].getCommand();
 			infoPanel.displayString("> " + string);
-			string = commandPanel.getString();
 			string = string.toLowerCase();
 			string = string.trim();
 			string = string.replaceAll("( )+", " ");
@@ -193,10 +165,6 @@ public class UI {
 					commandId = CMD_BUY;
 					inputValid = hasNoArgument(words);
 					break;
-				case "pay" :
-					commandId = CMD_PAY_FINE;
-					inputValid = hasNoArgument(words);
-					break;
 				case "property" :
 					commandId = CMD_PROPERTY;
 					inputValid = hasNoArgument(words);
@@ -209,7 +177,6 @@ public class UI {
 					commandId = CMD_BANKRUPT;
 					inputValid = hasNoArgument(words);
 					break;
-				
 				case "mortgage" :
 					commandId = CMD_MORTGAGE;
 					if (hasOneArgument(words) && board.isProperty(words[1])) { 
@@ -247,25 +214,19 @@ public class UI {
 					} else {
 						inputValid = false;
 					}
-					break;					
+					break;		
+				case "card":
+					commandId = CMD_CARD;
+					inputValid = true;
+					break;
+				case "pay":
+					commandId = CMD_PAY;
+					inputValid = true;
+					break;
 				case "help" :
 					commandId = CMD_HELP;
-					inputValid = hasNoArgument(words);
-					break;
-				case "pay10" :
-					commandId = CMD_PAY_10;
+					inputValid = hasOneArgument(words);
 					inputValid = true;
-					inputValid = hasNoArgument(words);
-					break;
-				case "chance" :
-					commandId = CMD_TAKE_CHANCE;
-					inputValid = true;
-					inputValid = hasNoArgument(words);
-					break;
-				case "card" :
-					commandId = CMD_USE_CARD;
-					inputValid = true;
-					inputValid = hasNoArgument(words);
 					break;
 				default:
 					inputValid = false;
@@ -285,8 +246,6 @@ public class UI {
 	public String getString () {
 		return string; 
 	}
-	
-	
 	
 	public String getTokenName (int tokenId) {
 		return boardPanel.getTokenName(tokenId);
@@ -312,7 +271,36 @@ public class UI {
 		return inputNumber;
 	}
 	
-	
+	public void inputPayOrChance (Player player) {
+		boolean inputValid = false;
+		do {
+			infoPanel.displayString(player + " type pay or chance:");
+			string = bots[player.getTokenId()].getDecision();
+			infoPanel.displayString("> " + string);
+			string = commandPanel.getString();
+			string = string.toLowerCase();
+			string = string.trim();
+			switch (string) {
+				case "pay":
+					inputWasPay = true;
+					inputValid = true;
+					break;
+				case "chance":
+					inputWasPay = false;
+					inputValid = true;
+					break;
+			}
+			if (!inputValid) {
+				displayError(ERR_SYNTAX);
+			}
+		} while (!inputValid);
+		return;
+	}
+
+	public boolean inputWasPay () {
+		return inputWasPay;
+	}
+			
 // DISPLAY METHODS
 	
 	public void display () {
@@ -326,16 +314,19 @@ public class UI {
 	}
 	
 	public void displayBankTransaction (Player player) {
-		if (player.getTransaction() >= 0) {
+		if (player.getTransaction() > 0) {
 			infoPanel.displayString(player + " receives " + player.getTransaction() + CURRENCY + " from the bank.");
-		} else {
+		} else if (player.getTransaction() == 0) {
+			infoPanel.displayString("No money is transferred.");			
+		}
+		else {
 			infoPanel.displayString(player + " pays " + (-player.getTransaction()) + CURRENCY + " to the bank.");			
 		}
 		return;
 	}
 	
 	public void displayTransaction (Player fromPlayer, Player toPlayer) {
-		infoPanel.displayString(fromPlayer + " pays " + toPlayer.getTransaction() + CURRENCY + " to " + toPlayer);
+		infoPanel.displayString(fromPlayer + " pays " + toPlayer.getTransaction() + CURRENCY + " to " + toPlayer + ".");
 		return;
 	}
 	
@@ -361,11 +352,12 @@ public class UI {
 	
 	public void displayCommandHelp () {
 		infoPanel.displayString("Available commands: roll, buy, pay rent, build, demolish, mortgage, redeem, bankrupt, property, balance, done, quit. ");
+		infoPanel.displayString("Available commands in jail: roll, card, pay. ");
 		return;
 	}
 	
 	public void displayBalance (Player player) {
-		infoPanel.displayString(player + "'s balance is " + player.getBalance() + CURRENCY);
+		infoPanel.displayString(player + "'s balance is " + player.getBalance() + CURRENCY + ".");
 		return;
 	}
 	
@@ -380,7 +372,7 @@ public class UI {
 	}
 	
 	public void displayLatestProperty (Player player) {
-		infoPanel.displayString(player + " bought " + player.getLatestProperty());
+		infoPanel.displayString(player + " bought " + player.getLatestProperty() + ".");
 	}
 	
 	public void displayProperty (Player player) {
@@ -416,13 +408,13 @@ public class UI {
 		}
 	}
 	
-	public void displaySquare (Player player, Board board, Dice dice) {
+	public void displaySquare (Player player) {
 		Square square = board.getSquare(player.getPosition());
 		infoPanel.displayString(player + " arrives at " + square.getName() + ".");
 		if (square instanceof Property) {
 			Property property = (Property) square;
 			if (property.isOwned()) {
-				infoPanel.displayString("The property is owned by " + property.getOwner() + ". Rent is " + property.getRent() + CURRENCY + ".");				
+				infoPanel.displayString("The property is owned by " + property.getOwner() + ".");				
 			} else {
 				infoPanel.displayString("The property is not owned.");								
 			}
@@ -432,18 +424,18 @@ public class UI {
 	
 	public void displayBuild (Player player, Site site, int numUnits) {
 		if (numUnits==1) {
-			infoPanel.displayString(player + " builds 1 unit on " + site);			
+			infoPanel.displayString(player + " builds 1 unit on " + site + ".");			
 		} else {
-			infoPanel.displayString(player + " builds " + numUnits + " units on " + site);
+			infoPanel.displayString(player + " builds " + numUnits + " units on " + site + ".");
 		}
 		return;
 	}
 	
 	public void displayDemolish (Player player, Site site, int numUnits) {
 		if (numUnits==1) {
-			infoPanel.displayString(player + " demolishes 1 unit on " + site);			
+			infoPanel.displayString(player + " demolishes 1 unit on " + site + ".");			
 		} else {
-			infoPanel.displayString(player + " demolishes " + numUnits + " units on " + site);
+			infoPanel.displayString(player + " demolishes " + numUnits + " units on " + site + ".");
 		}
 		return;
 	}	
@@ -454,72 +446,47 @@ public class UI {
 	}
 	
 	public void displayMortgage (Player player, Property property) {
-		infoPanel.displayString(player + " mortgages " + property + " for " + property.getMortgageValue() + CURRENCY);
+		infoPanel.displayString(player + " mortgages " + property + " for " + property.getMortgageValue() + CURRENCY + ".");
 		return;				
 	}
 	
 	public void displayMortgageRedemption (Player player, Property property) {
-		infoPanel.displayString(player + " redeems " + property + " for " + property.getMortgageRemptionPrice() + CURRENCY);
+		infoPanel.displayString(player + " redeems " + property + " for " + property.getMortgageRemptionPrice() + CURRENCY + ".");
 		return;
 	}
 	
 	public void displayAssets (Player player) {
-		infoPanel.displayString(player + " has assets of " + player.getAssets() + CURRENCY);
+		infoPanel.displayString(player + " has assets of " + player.getAssets() + CURRENCY + ".");
 		return;
 	}
 	
 	public void displayWinner (Player player) {
-		infoPanel.displayString("The winner is " + player);
+		infoPanel.displayString("The winner is " + player + ".");
 		return;
 	}
 	
 	public void displayDraw (ArrayList<Player> players) {
-		infoPanel.displayString("The following players drew the game " + players);
+		infoPanel.displayString("The following players drew the game " + players + ".");
 		return;
 	}
 	
-	public void displayMovedToGo (Player player) {
-		infoPanel.displayString(player + " has been moved to Go.");
+	public void displayCard (Card card) {
+		infoPanel.displayString("The card says: " + card);
 		return;
 	}
 	
-	public void displayMovedToBikeShop (Player player) {
-		infoPanel.displayString(player + " has been moved to Bike Shop.");
+	public void displayThreeDoubles (Player player) {
+		infoPanel.displayString(player + " rolled three doubles. Go to Jail.");
 		return;
 	}
 	
-	public void displayLandedOnCommunityChest (Player player) {
-		infoPanel.displayString(player + " landed on Community Chest!.");
+	public void displayFreeFromJail (Player player) {
+		infoPanel.displayString(player + " is free from jail.");
 		return;
 	}
 	
-	public void displayLandedOnChance (Player player) {
-		infoPanel.displayString(player + " landed on Chance!.");
+	public void displayJailFine (Player player, int fine) {
+		infoPanel.displayString(player + " pays fine of " + fine + CURRENCY + " to leave jail.");
 		return;
-	}
-
-	public void displayGetOutOfJail(Player player) {
-		infoPanel.displayString(player + "has rolled a double and is now out of jail");
-		
-	}
-
-	public void displayNotGetOutOfJail(Player player) {
-		infoPanel.displayString(player + "has not rolled a double and will remain in jail");
-		return;
-		
-	}
-
-	public void displayFine(Player player) {
-		infoPanel.displayString(player + "has not rolled a double and pays the fine and is now out of jail");
-		return;
-	}
-
-	public void displayRolledToJail(Player player) {
-		infoPanel.displayString(player + "has somehow rolled 3 doubles in a row and is now moved to jail");
-		return;
-	}
-	
-	public void displayMovedToJail(Player player){
-		infoPanel.displayString(player + "has arrived in jail");
 	}
 }
