@@ -8,6 +8,7 @@ public class MrPenneybags implements Bot {
 	private BoardAPI board;
 	private PlayerAPI player;
 	private DiceAPI dice;
+	private String x;
 	
 	MrPenneybags (BoardAPI board, PlayerAPI player, DiceAPI dice) {
 		this.board = board;
@@ -17,7 +18,37 @@ public class MrPenneybags implements Bot {
 	}
 	
 	public String getName () {
-		return "MrPennybags";
+/*	Square position;
+		position = board.getSquare(player.getPosition());
+		int positions = 2;
+		if(position instanceof Property){
+			Property property = (Property) board.getSquare(player.getPosition());
+			if(property.getOwner() != player){
+				x = "Pay rent";
+				return x;
+			}
+			else{
+				x = "buy";
+				return x;
+			}
+		}
+		if(position instanceof Site){
+			Site site = (Site) board.getSquare(player.getPosition());
+			if(site.getOwner() != player){
+				x = "Pay Rent";
+				return x;
+			}
+			else{
+				x = "buy";
+				return x;
+			}
+		}
+		if(position instanceof Station ){
+			Site site = (Site) board.get
+		}
+		*/ x = "roll";
+		
+		return x;
 	}
 	
 	
@@ -31,10 +62,9 @@ public class MrPenneybags implements Bot {
 		
 		
 		
+x = "roll";
 		
-		
-		
-		
+		return x;
 		
 		
 		
@@ -42,7 +72,7 @@ public class MrPenneybags implements Bot {
 		
 		// Add your code here
 		
-		return "help";
+		
 	}
 	
 	
@@ -60,12 +90,9 @@ public class MrPenneybags implements Bot {
 		
 		
 		
+x = "roll";
 		
-		
-		
-		
-		// Add your code here
-		return "pay";
+		return x;
 	}
 	
 	
