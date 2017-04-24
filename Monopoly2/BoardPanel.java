@@ -30,7 +30,7 @@ class BoardPanel extends JPanel {
 		setBackground(Color.WHITE);
 		try {
 //			boardImage = ImageIO.read(new File("board.jpg"));
-			boardImage = ImageIO.read(this.getClass().getResource("board.jpg"));
+			boardImage = ImageIO.read(this.getClass().getResource("board.png"));
 		} catch (IOException ex) {
 			System.out.println("Could not find the image file " + ex.toString());
 		}

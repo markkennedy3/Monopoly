@@ -9,8 +9,8 @@ public class UI {
 	private static final int FRAME_WIDTH = 1200;
 	private static final int FRAME_HEIGHT = 800;
 
-	public static final String CURRENCY = " pounds";
-	public static final String CURRENCY_SYMBOL = "£";
+	public static final String CURRENCY = " Euros";
+	public static final String CURRENCY_SYMBOL = "€";
 	
 	public static final int CMD_QUIT = 0;
 	public static final int CMD_DONE = 1;
@@ -277,7 +277,6 @@ public class UI {
 			infoPanel.displayString(player + " type pay or chance:");
 			string = bots[player.getTokenId()].getDecision();
 			infoPanel.displayString("> " + string);
-			string = commandPanel.getString();
 			string = string.toLowerCase();
 			string = string.trim();
 			switch (string) {

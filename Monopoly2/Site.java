@@ -16,7 +16,7 @@ public class Site extends Property {
 		numBuildings = 0;
 		colourGroup.addMember(this);
 		return;
-	}
+	}	
 	
 // METHODS DEALING WITH BUILDING UNITS (HOUSES AND HOTELS)
 	

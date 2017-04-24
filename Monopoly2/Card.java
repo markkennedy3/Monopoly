@@ -16,7 +16,7 @@ public class Card {
 		this.type = type;
 		this.message = message;
 		this.actionId = actionId;
-		return;
+		return;//lol
 	}
 	
 	Card (int type, String message, int actionId, int parameter) {

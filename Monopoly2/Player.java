@@ -160,6 +160,10 @@ public class Player implements PlayerAPI {
 		return;
 	}
 	
+	public int getNumProperties () {
+		return properties.size();
+	}
+	
 	public Property getLatestProperty () {
 		return properties.get(properties.size()-1);
 	}
