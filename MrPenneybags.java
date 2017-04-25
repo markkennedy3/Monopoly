@@ -39,7 +39,7 @@ public class MrPenneybags implements Bot {
 			rolldone = true;
 			
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -59,12 +59,9 @@ public class MrPenneybags implements Bot {
      	if(position instanceof Property){
 		 Property property = (Property) board.getSquare(player.getPosition());
 		
-		 if (property.isOwned() && property.getOwner() != player && player.getBalance() >= 150){
-		 }
-		 else if(!property.isOwned()){
-				command = "buy";
-				return command;
-			}
+		 if (!property.isOwned() && player.getBalance() >= 150){
+			 command = "buy";
+			 return command;}
 		}	
      	
      	Square buildhouse;
@@ -73,13 +70,28 @@ public class MrPenneybags implements Bot {
      	if(buildhouse instanceof Site){
 		 Site site = (Site) board.getSquare(player.getPosition());
 		
-		 if (site.isOwned() && site.getOwner() == player && player.getBalance() >= 1000 && player.isGroupOwner(site)==true && site.getNumHouses()<=2)
+		 if (site.isOwned() && site.getOwner() == player && player.getBalance() >= 1000 && player.isGroupOwner(site)==true && site.getNumHouses()<=3)
 		 {
 				command = "build house";
 				return command;
 			}
 		
 		}	
+     	
+
+     	/*Square buystation;
+     	buystation = board.getSquare(player.getPosition());
+		
+     	if(buystation instanceof Station){
+		 Station station = (Station) board.getSquare(player.getPosition());
+		
+		 if (station.isOwned() && station.getOwner() == player && player.getBalance() >= 300)
+		 {
+				command = "buy";
+				return command;
+			}
+		
+		}*/
 		
      	
 		
