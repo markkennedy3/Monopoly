@@ -18,10 +18,7 @@ public class MrPenneybags implements Bot {
 	}
 	
 	public String getName () {
-/*	
-		*/
-		
-		return "Mr Penneybags";
+		return "MrPenneybags";
 	}
 	
 	
@@ -31,106 +28,68 @@ public class MrPenneybags implements Bot {
 	
 	public String getCommand () {
 		
+
 		
 		String command = "roll";
-		//command="roll";
+		
 		
 		if(rolldone==false)
 		{
 			command="roll";
 			rolldone = true;
+			
 			try {
-				Thread.sleep(500);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
 		}
-		
-		else
+		else 
 		{
 			command="done";
 			rolldone = false;
 			
-			
 		}
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		/*
+				
 		Square position;
 		position = board.getSquare(player.getPosition());
 		
-		if(player.isInJail() == true){
-			x = "roll";
-			return x;
+     	if(position instanceof Property){
+		 Property property = (Property) board.getSquare(player.getPosition());
 		
-		}else{
-			x = "roll";
-		}
+		 if (property.isOwned() && property.getOwner() != player && player.getBalance() >= 150){
+				command = "pay rent";
+				return command;
+			}
 		
+		 else if(!property.isOwned()){
+				command = "buy";
+				return command;
+			}
+		}	
+     	
+     	Square position1;
+		position1 = board.getSquare(player.getPosition());
 		
+     	if(position1 instanceof Property){
+		 Property property = (Property) board.getSquare(player.getPosition());
 		
-		if(position instanceof Property){
-			Property property = (Property) board.getSquare(player.getPosition());
-			if(property.getOwner() != player){
-				x = "pay rent";
-				return x;
+		 if (property.isOwned() && property.getOwner() == player && player.getBalance() >= 1000 && player.isGroupOwner==true){
+				command = "build house";
+				return command;
 			}
-			else{
-				x = "buy";
-				return x;
-			}
-		}
-		if(position instanceof Site){
-			Site site = (Site) board.getSquare(player.getPosition());
-			if(player.isGroupOwner(site)){
-				x = "mortgage" + site;//Not sure if correct practice
-			}
-			if(site.getOwner() != player){
-				x = "pay rent";
-				return x;
-			}
-			else{
-				x = "buy";
-				return x;
-			}
-			
-		}
-		if(position instanceof Station ){
-			Site site = (Site) board.getSquare(player.getPosition());
-			if(site.getOwner() != player){
-				x = "pay rent";
-			}
-			else{
-				x = "buy";
-			}
-			
-		}
-		if(position instanceof Station ){
-			Site site = (Site) board.getSquare(player.getPosition());
-			if(site.getOwner() != player){
-				x = "pay rent";
-			}
-			else{
-				x = "buy";
-			}
-			
-		}
-		*/
 		
+		}	
 		
+     	
 		
 		return command;
-	
 		
+		
+		
+	
 		
 	}
 	
