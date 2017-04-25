@@ -56,10 +56,10 @@ public class MrPenneybags implements Bot {
 		Square position;
 		position = board.getSquare(player.getPosition());
 		
-     	if(position instanceof Property){
-		 Property property = (Property) board.getSquare(player.getPosition());
+     	if(position instanceof Site){
+		 Site site = (Site) board.getSquare(player.getPosition());
 		
-		 if (!property.isOwned() && player.getBalance() >= 150){
+		 if (!site.isOwned() && player.getBalance() >= 150){
 			 command = "buy";
 			 return command;}
 		}	
@@ -78,8 +78,31 @@ public class MrPenneybags implements Bot {
 		
 		}	
      	
+     	/*Square payorchance;
+     	payorchance = board.getSquare(player.getPosition());
+		
+     	if(payorchance instanceof CommunityChest){
+     	 CommunityChest communitychest= (CommunityChest) board.getSquare(player.getPosition());
+		 Card card = null;
+		 /*Card test = null;
+		 ChanceDeck hold = null;
+		 card = hold.get();
+		
+		 if (player.getBalance() >= 500 && card.getAction() == 8 )
+		 {
+				command = "pay";
+				return command;
+			}
+		 else{
+			 command = "take chance";
+			 return command;
+					 
+		 }
+		
+		}	*/
+     	
 
-     	/*Square buystation;
+     	Square buystation;
      	buystation = board.getSquare(player.getPosition());
 		
      	if(buystation instanceof Station){
@@ -91,7 +114,7 @@ public class MrPenneybags implements Bot {
 				return command;
 			}
 		
-		}*/
+		}
 		
      	
 		
