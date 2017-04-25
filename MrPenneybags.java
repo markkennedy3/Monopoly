@@ -70,13 +70,14 @@ public class MrPenneybags implements Bot {
 			}
 		}	
      	
-     	Square position1;
-		position1 = board.getSquare(player.getPosition());
+     	Square buildhouse;
+     	buildhouse = board.getSquare(player.getPosition());
 		
-     	if(position1 instanceof Property){
-		 Property property = (Property) board.getSquare(player.getPosition());
+     	if(buildhouse instanceof Property){
+		 Site site = (Site) board.getSquare(player.getPosition());
 		
-		 if (property.isOwned() && property.getOwner() == player && player.getBalance() >= 1000 && player.isGroupOwner==true){
+		 if (site.isOwned() && site.getOwner() == player && player.getBalance() >= 1000 && player.isGroupOwner(site)==true && site.getNumHouses()<=2)
+		 {
 				command = "build house";
 				return command;
 			}
