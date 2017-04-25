@@ -60,10 +60,11 @@ public class MrPenneybags implements Bot {
 		 Property property = (Property) board.getSquare(player.getPosition());
 		
 		 if (property.isOwned() && property.getOwner() != player && player.getBalance() >= 150){
-				if(!property.isOwned()){
+		 }
+		 else if(!property.isOwned()){
 				command = "buy";
 				return command;
-			}}
+			}
 		}	
      	
      	Square buildhouse;
