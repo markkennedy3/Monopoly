@@ -39,7 +39,7 @@ public class MrPenneybags implements Bot {
 			rolldone = true;
 			
 			try {
-				Thread.sleep(500);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -59,49 +59,83 @@ public class MrPenneybags implements Bot {
      	if(position instanceof Site){
 		 Site site = (Site) board.getSquare(player.getPosition());
 		
-		 if (!site.isOwned() && player.getBalance() >= 150){
+		 if (!site.isOwned() && player.getBalance() >= 401){
 			 command = "buy";
 			 return command;}
 		}	
      	
      	Square buildhouse;
      	buildhouse = board.getSquare(player.getPosition());
+     	int numToBuild = 0;
 		
      	if(buildhouse instanceof Site){
 		 Site site = (Site) board.getSquare(player.getPosition());
 		
-		 if (site.isOwned() && site.getOwner() == player && player.getBalance() >= 1000 && player.isGroupOwner(site)==true && site.getNumHouses()<=3)
+		 if (site.isOwned() && site.getOwner() == player && player.getBalance() >= 750 && player.isGroupOwner(site)==true && site.getNumHouses()<3)
 		 {
-				command = "build house";
-				return command;
+			 String siteName =  site.getShortName();
+				command = "build ";//build site that were on
+				if(player.getBalance() >= 2000 && site.getNumHouses()==0 ){
+					numToBuild = 3;
+				}
+				else if(player.getBalance() >= 1250 && site.getNumHouses()>=1){
+					numToBuild = 2;
+				}
+				else if(player.getBalance() >= 750 && site.getNumHouses()>=2){
+					numToBuild = 1;
+				}
+				String numberOfHouses = Integer.toString(numToBuild);
+				/*if(numToBuild == 3){
+					command = "done";
+					return command;
+				}*/
+				
+				if(numToBuild != 0){
+					String appended = command + siteName + " " + numberOfHouses;
+					return appended;
+				}
+				
+				else if(numToBuild == 0){
+					command = "roll";
+					if(rolldone==true)
+					{
+						command="done";
+											
+				}
+					return command;
+					
+					
+				}
+				
 			}
+		 
+		 
 		
 		}	
-     	
-     	/*Square payorchance;
+ /*
+     	Square payorchance;
      	payorchance = board.getSquare(player.getPosition());
+     	Card chest = null;
 		
      	if(payorchance instanceof CommunityChest){
-     	 CommunityChest communitychest= (CommunityChest) board.getSquare(player.getPosition());
-		 Card card = null;
-		 /*Card test = null;
-		 ChanceDeck hold = null;
-		 card = hold.get();
+     		if(chest.getAction()==8)
+     		
+		 String decision = getDecision();
 		
-		 if (player.getBalance() >= 500 && card.getAction() == 8 )
+		 if (decision == "pay")
 		 {
 				command = "pay";
 				return command;
 			}
 		 else{
-			 command = "take chance";
+			 command = "chance";
 			 return command;
 					 
 		 }
 		
-		}	*/
+		}
+     	*/
      	
-
      	Square buystation;
      	buystation = board.getSquare(player.getPosition());
 		
@@ -134,6 +168,19 @@ public class MrPenneybags implements Bot {
 	
 	public String getDecision () {
 		
-	return " ";
+		//for pay or take chance//
+
+		String result;
+		
+		 if (player.getBalance() >= 500 )
+		 {
+				result = "pay";
+				return result;
+			}
+		 else{
+			 result = "chance";
+			 return result;
+					 
+		 }
 	}
 }
