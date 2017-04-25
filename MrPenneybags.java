@@ -8,7 +8,7 @@ public class MrPenneybags implements Bot {
 	private BoardAPI board;
 	private PlayerAPI player;
 	private DiceAPI dice;
-	private String x;
+	private boolean rolldone = false;
 	
 	MrPenneybags (BoardAPI board, PlayerAPI player, DiceAPI dice) {
 		this.board = board;
@@ -30,6 +30,38 @@ public class MrPenneybags implements Bot {
 	
 	
 	public String getCommand () {
+		
+		
+		String command = "roll";
+		//command="roll";
+		
+		if(rolldone==false)
+		{
+			command="roll";
+			rolldone = true;
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+		else
+		{
+			command="done";
+			rolldone = false;
+			
+			
+		}
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		/*
@@ -93,20 +125,11 @@ public class MrPenneybags implements Bot {
 			
 		}
 		*/
-		x = "roll";
 		
 		
 		
-		
-
-		
-		return x;
-		
-		
-		
-		
-		
-		// Add your code here
+		return command;
+	
 		
 		
 	}
