@@ -73,18 +73,24 @@ public class MrPenneybags implements Bot {
      	    		
      	    		 if (site.isOwned() && site.getOwner() == player && player.getBalance() >= 750 && player.isGroupOwner(site)==true && site.getNumHouses()<3){
      	    			 String siteName =  site.getShortName();
-     	    				command = "build ";//build site that were on
+     	    			
+     	    			 command = "build ";//build site that were on
      	    				
-     	    				if(player.getBalance() >= 750 ){
+     	    				if(player.getBalance() >= 750 && player.getBalance() < 1250){
      	    					numToBuild = 1;
      	    				}
      	    				
-     	    				String numberOfHouses = Integer.toString(numToBuild);
-     	    				if(numToBuild == 3){
-     	    					command = "done";
-     	    					return command;
+     	    				if(player.getBalance() >= 1250 && player.getBalance() < 2500){
+     	    					numToBuild = 2;
      	    				}
      	    				
+     	    				if(player.getBalance() >= 2500){
+     	    					numToBuild = 3;
+     	    				}
+     	    				
+     	    				
+     	    				String numberOfHouses = Integer.toString(numToBuild);
+     	    			
      	    				if(numToBuild != 0){
      	    					String appended = command + siteName + " " + numberOfHouses;
      	    					return appended;
