@@ -103,7 +103,7 @@ public class MrPenneybags implements Bot {
      	    				String numberOfHouses = Integer.toString(numToBuild);
      	    			
      	    				if(numToBuild != 0){
-     	    					String appended = command +" "+ siteName + " " + numberOfHouses;
+     	    					String appended = command + " " + siteName + " " + numberOfHouses;
      	    					return appended;
      	    				}
      	    				
