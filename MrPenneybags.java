@@ -9,6 +9,7 @@ public class MrPenneybags implements Bot {
 	private PlayerAPI player;
 	private DiceAPI dice;
 	private boolean rolldone = false;
+	private int numOfMortgageCommands = 0;
 	
 	MrPenneybags (BoardAPI board, PlayerAPI player, DiceAPI dice) {
 		this.board = board;
@@ -118,17 +119,66 @@ public class MrPenneybags implements Bot {
      	    		     }
      	    		 }
      	         	
+Square positionMortgage = board.getSquare(player.getPosition());
+     	         	
+     	         	
+     	         	if(positionMortgage instanceof Site){
+     	         	Site sites = (Site) board.getSquare(player.getPosition());
+     	         	ColourGroup group = sites.getColourGroup();
+     	         	
+     	         	if(sites.isOwned() && sites.getOwner() == player){
+     	         	for (Site s : group.getMembers()) {
+     	   			if (s.isOwned() && s.getOwner() != player){
+     	   				if(numOfMortgageCommands == 1){
+ 	   					command = "roll";
+ 	   						if(rolldone==true){
+ 	   						command="done";
+ 	   					}
+ 	   				
+ 	   			}else{
+     	   				command = TellToMortgage(command, sites);
+     	   				numOfMortgageCommands += 1;
+     	   				
+ 	   					}
+     	   				
+ 	   		}else{
+ 	   			command = "roll";
+				if(rolldone==true){
+				command="done";
+					}
+				}
+         	}
+ 	    }
+ 	}
+     	         	
 		return command;
      	       	        
 	}
 	
-    
+	public String TellToMortgage (String command, Site sites){
+		String result = null;
+		if(sites.isMortgaged() == true){
+      		command = "roll";
+      		if(rolldone == true){
+      			command = "done";
+      			result = command;
+      		}
+      	}
+      	else if(!player.isGroupOwner(sites)){
+      		  String siteName = sites.getShortName();
+      		  String hold = "mortgage";
+      		  command = hold + " " + siteName;
+      		  result = command;
+  			}
+			return result;
+	}
 
 	public String getDecision () {
 		
 		 String result;
 		 if (player.getBalance() >= 500 ) 
-		 { result = "pay"; return result; 
+		 { result = "pay"; 
+		 return result; 
 		 } 
 		 else{
 			 result = "chance"; 
