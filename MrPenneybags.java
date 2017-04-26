@@ -21,7 +21,8 @@ public class MrPenneybags implements Bot {
 		return "MrPenneybags";
 	}
 	
-     public String getCommand () {
+    
+	public String getCommand () {
 		
 		String command = "roll";
 		
@@ -29,7 +30,7 @@ public class MrPenneybags implements Bot {
 			command="roll";
 			rolldone = true;
 			
-		try {Thread.sleep(0);}
+		try {Thread.sleep(50);}
 			catch (InterruptedException e){
 				e.printStackTrace();}
 		}
@@ -43,17 +44,35 @@ public class MrPenneybags implements Bot {
           }	
      
      
-		
+		//PAY OR CHANCE IN COMMUNITY CHEST
+		/*
+		String decision = null;
+		Square payorchance; 
+		payorchance = board.getSquare(player.getPosition());
+		Card chest = null;
+		if(payorchance instanceof CommunityChest){
+			if(chest.getAction()==8) 
+				decision = getDecision();
+			if (decision == "pay") {
+				command = "pay";
+				return command; }
+			else{ 
+				command = "chance"; 
+				return command;
+			}
+		}*/
 		//TACTICS
 		
 		Square position = board.getSquare(player.getPosition());
 		
      	                 if(position instanceof Site){
 		                    Site site = (Site) board.getSquare(player.getPosition());
-		                     if (!site.isOwned() && player.getBalance() >= site.getPrice()){
+		                     if (!site.isOwned() && player.getBalance() >= site.getPrice() 
+		                    		 &&!(site.getShortName() == "whitechapel") &&!(site.getShortName() == "strand")){
 			                     command = "buy";
 			                     return command;}
      	                 }
+     	               
 		                    
      	                 
      	                
@@ -74,17 +93,9 @@ public class MrPenneybags implements Bot {
      	    		 if (site.isOwned() && site.getOwner() == player && player.getBalance() >= 750 && player.isGroupOwner(site)==true && site.getNumHouses()<3){
      	    			 String siteName =  site.getShortName();
      	    			
-     	    			 command = "build ";//build site that were on
+     	    			 command = "build";//build site that were on
      	    				
-     	    				if(player.getBalance() >= 750 && player.getBalance() < 1250){
-     	    					numToBuild = 1;
-     	    				}
-     	    				
-     	    				if(player.getBalance() >= 1250 && player.getBalance() < 2500){
-     	    					numToBuild = 2;
-     	    				}
-     	    				
-     	    				if(player.getBalance() >= 2500){
+     	    				if(player.getBalance() >= 750){
      	    					numToBuild = 3;
      	    				}
      	    				
@@ -92,7 +103,7 @@ public class MrPenneybags implements Bot {
      	    				String numberOfHouses = Integer.toString(numToBuild);
      	    			
      	    				if(numToBuild != 0){
-     	    					String appended = command + siteName + " " + numberOfHouses;
+     	    					String appended = command +" "+ siteName + " " + numberOfHouses;
      	    					return appended;
      	    				}
      	    				
@@ -111,7 +122,18 @@ public class MrPenneybags implements Bot {
      	       	        
 	}
 	
+    
+
 	public String getDecision () {
-		return " ";
+		
+		 String result;
+		 if (player.getBalance() >= 500 ) 
+		 { result = "pay"; return result; 
+		 } 
+		 else{
+			 result = "chance"; 
+			 return result; } 
+		 } 
 	}
-}
+
+		
