@@ -25,13 +25,13 @@ public class MrPenneybags implements Bot {
     
 	public String getCommand () {
 		
-		String command = "roll";
+		String command = "roll";//The default command
 		
 		if(rolldone==false){
 			command="roll";
 			rolldone = true;
 			
-		try {Thread.sleep(50);}
+		try {Thread.sleep(50);}//Controls the speed of the game 
 			catch (InterruptedException e){
 				e.printStackTrace();}
 		}
@@ -39,7 +39,7 @@ public class MrPenneybags implements Bot {
 			command="done";
 			rolldone=false;}
 		
-		if(player.getBalance() < 0){
+		if(player.getBalance() < 0){//if your bankrupt youre gone
             command = "bankrupt";
             return command;
           }	
@@ -66,7 +66,7 @@ public class MrPenneybags implements Bot {
 		
 		Square position = board.getSquare(player.getPosition());
 		
-     	                 if(position instanceof Site){
+     	                 if(position instanceof Site){//If it is a site we are buying it
 		                    Site site = (Site) board.getSquare(player.getPosition());
 		                     if (!site.isOwned() && player.getBalance() >= site.getPrice() 
 		                    		 &&!(site.getShortName() == "whitechapel") &&!(site.getShortName() == "strand")){
@@ -185,5 +185,3 @@ Square positionMortgage = board.getSquare(player.getPosition());
 			 return result; } 
 		 } 
 	}
-
-		
